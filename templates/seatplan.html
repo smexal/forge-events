@@ -1,0 +1,39 @@
+<div class="seatplan" data-api="{$api_url}" data-event="{$event_id}">
+    <div class="legend">
+        <div class="amount label">
+            {$amount}
+        </div>
+    {loop="status_list"}
+        <div class="legend-entry">
+            <div class="cell {$value.status}"></div><div class="label">{$value.name}</div>
+        </div>
+    {/loop}
+    </div>
+    <div class="columns">
+        <div class="name"></div>
+        {loop="column_names"}
+        <div class="name">
+            {$key}
+        </div>
+        {/loop}
+        <div class="name"></div>
+    </div>
+    {loop="rows"}
+    <div class="s-row" data-row-id="{$key}">
+        <div class="name">{$key}</div>
+        {loop="value"}
+        <div class="cell {$value.status}" data-cell-id="{$key}"></div>
+        {/loop}
+        <div class="name">{$key}</div>
+    </div>
+    {/loop}
+    <div class="columns">
+        <div class="name"></div>
+        {loop="column_names"}
+        <div class="name">
+            {$key}
+        </div>
+        {/loop}
+        <div class="name"></div>
+    </div>
+</div>

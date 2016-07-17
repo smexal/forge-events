@@ -1,0 +1,71 @@
+.seatplan {
+    border: 3px solid #eaeaea;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 30px;
+
+    .legend {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+
+        .label {
+            color: #333;
+            line-height: 23px;
+        }
+        .legend-entry {
+            display: flex;
+            flex-direction: row;
+        }
+    }
+
+    .cell, .name {
+        width: 17px;
+        height: 17px;
+        background-color: #FAFAFA;
+        border: 1px solid #F0F0F0;
+        margin: 4px;
+        border-radius: 2px;
+        cursor: pointer;
+
+        &:hover {
+            border-color: #eaeaea;
+            background-color: #F0F0F0;
+        }
+        &.available {
+            background-color: #42A5F5;
+            border-color: #1976D2;
+        }
+
+        &.blocked {
+            background-color: #E6EE9C;
+            border-color: #D4E157;
+        }
+
+        &.spacer {
+            background-color: #607D8B;
+            border-color: #455A64;
+        }
+    }
+
+    .name {
+        font-size: 11px;
+        line-height: 21px;
+        color: #AAA;
+        margin-bottom: 0;
+        text-transform: uppercase;
+        text-align: center;
+        border: none;
+        background: transparent;
+        cursor: default;
+        &:hover {
+            background: transparent;
+        }
+    }
+
+    .s-row, .columns {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}
