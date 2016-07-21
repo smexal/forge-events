@@ -14,16 +14,15 @@ class ForgeEvents extends Module {
     public function start() {
         Auth::registerPermissions($this->permission);
 
-        // if the user has the permission to edit events.
-        if(Auth::allowed($this->permission, true)) {
-            Loader::instance()->addStyle("modules/forge-events/assets/css/forge-events.less", false, "manage");
-            Loader::instance()->addScript("modules/forge-events/assets/scripts/forge-events.js");
+        // always load these files
+        Loader::instance()->loadDirectory(MOD_ROOT."forge-events/views/");
 
-            require_once($this->directory()."collection.event.php");
-            require_once($this->directory()."classes/class.seatplan.php");
+        require_once($this->directory()."collection.event.php");
+        require_once($this->directory()."classes/class.seatplan.php");
+        Loader::instance()->addStyle("modules/forge-events/assets/css/forge-events.less", false, "manage");
+        Loader::instance()->addScript("modules/forge-events/assets/scripts/forge-events.js");
 
-            API::instance()->register('forge-events', array($this, 'apiAdapter'));
-        }
+        API::instance()->register('forge-events', array($this, 'apiAdapter'));
     }
 
     public function apiAdapter($data) {

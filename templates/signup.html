@@ -1,0 +1,14 @@
+<div class="wrapped">
+    <h1>{$title}</h1>
+
+    <div class="signup">
+    <ul class="nav nav-tabs">
+    {loop="steps"}
+        <li class="{if="$value.active"}active{/if}">
+            <a href="#">{$value.title}</a>
+        </li>
+    {/loop}
+    </ul>
+
+    </div>
+</div>
