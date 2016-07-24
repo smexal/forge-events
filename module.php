@@ -19,8 +19,14 @@ class ForgeEvents extends Module {
         Loader::instance()->loadDirectory(MOD_ROOT."forge-events/views/");
 
         require_once($this->directory()."collection.event.php");
-        Loader::instance()->addStyle("modules/forge-events/assets/css/forge-events.less", false, "manage");
+
+        // backend
+        Loader::instance()->addStyle("modules/forge-events/assets/css/forge-events.less");
         Loader::instance()->addScript("modules/forge-events/assets/scripts/forge-events.js");
+
+        // frontend
+        App::instance()->tm->theme->addScript($this->url()."assets/scripts/forge-events.js", true);
+        App::instance()->tm->theme->addStyle(MOD_ROOT."forge-events/assets/css/forge-events.less");
 
         API::instance()->register('forge-events', array($this, 'apiAdapter'));
     }

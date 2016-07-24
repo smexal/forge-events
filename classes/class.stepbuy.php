@@ -16,15 +16,28 @@ class SignupStepBuy {
         ));
     }
 
+    private function getTotal() {
+        return  Utils::formatAmount($this->event->getMeta('price'));
+    }
+
+    private function getTicketStatus($userid) {
+        return '<span class="special">'.i('Available', 'forge-events').'</span>';
+    }
+
     public function getTd() {
         $rows = array();
         array_push($rows, array(
-            'available', 
+            $this->getTicketStatus(App::instance()->user->get('id')), 
             App::instance()->user->get('username').' ('.App::instance()->user->get('email').')', 
             'default', 
-            Utils::formatAmount($this->event->getMeta('price'))
+            Utils::formatAmount($this->event->getMeta('price')),
+            $this->getAction(App::instance()->user->get('id'))
         ));
         return $rows;
+    }
+
+    public function getAction() {
+        return '<a href="#" class="btn btn-discreet">Buy</a>';
     }
 
     public function getTr() {
@@ -40,6 +53,9 @@ class SignupStepBuy {
             ),
             array(
                 'name' => i('Price', 'forge-events')
+            ),
+            array(
+                'name' => ""
             )
         );
     }
