@@ -3,6 +3,7 @@ class ForgeEventSignup extends AbstractView {
     public $name = 'event-signup';
     public $allowNavigation = true;
     private $event = null;
+    private $signup = false;
 
     public function additionalNavigationForm() {
         $events = App::instance()->cm->getCollection('forge-events')->items();
@@ -21,27 +22,15 @@ class ForgeEventSignup extends AbstractView {
     public function content($parts = array()) {
         $collection = App::instance()->cm->getCollection('forge-events');
         $this->event = $collection->getBySlug($parts[0]);
+        $this->signup = new Signup($this->event);
 
         return App::instance()->render(MOD_ROOT."forge-events/templates/", "signup", array(
             'title' => sprintf(i('Signup for %s'), $this->event->getMeta('title')),
-            'steps' => $this->getSteps()
+            'steps' => $this->signup->getSteps(),
+            'stepcontent' => $this->signup->getContents()
         ));
     }
 
     private function getSteps() {
-        return array(
-            array(
-                'active' => true,
-                'title' => i('1. Verify users', 'forge-events')
-            ),
-            array(
-                'active' => false,
-                'title' => i('2. Buy tickets', 'forge-events')
-            ),
-            array(
-                'active' => false,
-                'title' => i('3. Reserve your seats', 'forge-events')
-            )
-        );
     }
 }

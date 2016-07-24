@@ -4,11 +4,18 @@
     <div class="signup">
     <ul class="nav nav-tabs">
     {loop="steps"}
-        <li class="{if="$value.active"}active{/if}">
-            <a href="#">{$value.title}</a>
+        <li class="{if="$value.active"}active{/if}{if="$value.disabled"} disabled{/if}">
+            <a {if="!$value.disabled"}data-toggle="tab"{/if} href="#{$value.id}">{$value.title}</a>
         </li>
     {/loop}
     </ul>
+    <div class="tab-content">
+    {loop="stepcontent"}
+        <div id="{$value.id}" class="tab-pane fade{if="$value.active"} in active{/if}">
+        {$value.content}
+        </div>
+    {/if}
+    </div>
 
     </div>
 </div>

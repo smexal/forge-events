@@ -1,0 +1,34 @@
+<div class="step-user">
+    {if="$login"}
+    <div class="row">
+        <!-- Login -->
+        <div class="col-md-5">
+            <h3>{$login.title}</h3>
+            <p>{$login.intro}</p>
+            {$login.form}
+        </div>
+        <!-- Register -->
+        <div class="col-md-5 col-md-offset-2">
+            <h3>{$register.title}</h3>
+            <p>{$register.intro}<br />
+            <a href="{$register.url}">{$register.linktext}</a></p>
+            <!-- Recover -->
+            <h3>{$recover.title}</h3>
+            <p>{$recover.intro}<br />
+            <a href="{$recover.url}">{$recover.linktext}</a></p>
+        </div>
+        
+    </div>
+    {/if}
+    {if="$verification"}
+        <h3>{$verification.title}</h3>
+        <p>{$verification.text}<br />
+        {$verification.email}</p>
+        <a class="btn btn-primary" href="{$verification.resendurl}">{$verification.resendtext}</a>
+    {/if}
+    {if="$verified"}
+        <h3>{$verified.title}</h3>
+        <p>{$verified.text}</p>
+        <a class="btn btn-primary" href="{$verified.link}">{$verified.linktext}</a>
+    {/if}
+</div>

@@ -15,10 +15,10 @@ class ForgeEvents extends Module {
         Auth::registerPermissions($this->permission);
 
         // always load these files
+        Loader::instance()->loadDirectory(MOD_ROOT."forge-events/classes/");
         Loader::instance()->loadDirectory(MOD_ROOT."forge-events/views/");
 
         require_once($this->directory()."collection.event.php");
-        require_once($this->directory()."classes/class.seatplan.php");
         Loader::instance()->addStyle("modules/forge-events/assets/css/forge-events.less", false, "manage");
         Loader::instance()->addScript("modules/forge-events/assets/scripts/forge-events.js");
 

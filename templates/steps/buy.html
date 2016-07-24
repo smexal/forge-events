@@ -1,0 +1,19 @@
+<div class="step-buy">
+    <h3>{$title}</h3>
+    <table class="content-table">
+        <tr>
+        {loop="tr"}
+            <th>
+            {$value.name}
+            </th>
+        {/loop}
+        </tr>
+        {loop="td"}
+        <tr>
+            {loop="value"}
+                <td>{$value}</td>
+            {/loop}
+        </tr>
+        {/loop}
+    </table>
+</div>
