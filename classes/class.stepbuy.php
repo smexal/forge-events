@@ -25,6 +25,9 @@ class SignupStepBuy {
     }
 
     public function getTd() {
+        if(is_null(App::instance()->user)) {
+            return '';
+        }
         $rows = array();
         array_push($rows, array(
             $this->getTicketStatus(App::instance()->user->get('id')), 
@@ -37,7 +40,12 @@ class SignupStepBuy {
     }
 
     public function getAction() {
-        return '<a href="#" class="btn btn-discreet">Buy</a>';
+        return '<a href="#" class="btn btn-discreet payment-trigger" 
+            data-collection-item="'.$this->event->id.'"
+            data-price-field="price"
+            data-title="'.$this->event->getMeta('title').'"
+            data-api="'.Utils::getHomeUrl()."api/".'"
+        >Buy</a>';
     }
 
     public function getTr() {
