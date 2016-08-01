@@ -50,7 +50,7 @@ class SignupStepUser {
                 'form' => Login::instance()->form()
             ),
             'register' => array(
-                'title' => i('Register', 'forge-events'),
+                'title' => i('Registration', 'forge-events'),
                 'intro' => i('You can also create a new user, if you do not already have one.', 'forge-events'),
                 'url' => Utils::getUrl(array('registration')),
                 'linktext' => i('Start Registration', 'forge-events')
