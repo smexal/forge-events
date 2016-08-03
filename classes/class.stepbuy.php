@@ -41,7 +41,10 @@ class SignupStepBuy {
 
     public function getAction() {
         return '<a href="#" class="btn btn-discreet payment-trigger" 
+            data-redirect-success="'.Utils::getCurrentUrl().'"
+            data-redirect-cancel="'.Utils::getCurrentUrl().'"
             data-collection-item="'.$this->event->id.'"
+            data-payment-meta="'.urlencode(json_encode(array("ticket-type" => "default"))).'"
             data-price-field="price"
             data-title="'.$this->event->getMeta('title').'"
             data-api="'.Utils::getHomeUrl()."api/".'"
