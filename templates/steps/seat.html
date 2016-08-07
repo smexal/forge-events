@@ -1,0 +1,14 @@
+<div class="step-seat">
+    <div class="buyed-seats">
+        <h3>{$buyed_title}</h3>
+        <p>{$buyed_description}</p>
+        <ul>
+        {loop="buyed_seats"}
+            <li><input type="radio" name="user-to-set" checked="checked" data-user-id="{$value.id}"/> {$value.user}</li>
+        {/loop}
+        </ul>
+    </div>
+    <h3>{$seatplan_title}</h3>
+    <p>{$seatplan_description}</p>
+    {$seatplan}
+</div>

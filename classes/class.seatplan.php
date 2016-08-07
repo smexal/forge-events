@@ -4,27 +4,32 @@ class Seatplan {
     private $event = null;
     private $seatTable = 'forge_events_seats';
     private $seats = array();
+    private $trim = false;
+    private $db = null;
     private $seatStatus = array(
         0 => 'available',
         1 => 'blocked',
-        2 => 'spacer'
-    );
+        2 => 'spacer',
+        3 => 'sold'
+     );
 
-    public function __construct($id) {
+    public function __construct($id, $trim = false) {
         $this->event = $id;
+        $this->trim = $trim;
 
-        $db = App::instance()->db;
-        $db->where('event', $this->event);
-        $this->seats = $db->get($this->seatTable);
+        $this->db = App::instance()->db;
+        $this->db->where('event', $this->event);
+        $this->seats = $this->db->get($this->seatTable);
     }
 
     public function draw() {
         return App::instance()->render(MOD_ROOT."forge-events/templates/", "seatplan", array(
+            'trim' => $this->trim,
             'amount' => sprintf(i('Amount of Seats: %s'), $this->getSeatAmount()),
             'status_list' => $this->getAllStatus(),
             'event_id' => $this->event,
             'api_url' => Utils::getUrl(array("api", "forge-events", "seatplan", "toggle-seat")),
-            'column_names' => $this->getRow(0),
+            'column_names' => $this->getRow(1),
             'rows' => $this->getSeatRows()
         ));
     }
@@ -42,10 +47,19 @@ class Seatplan {
     private function getAllStatus() {
         $stats = array();
         foreach($this->seatStatus as $stat) {
-            array_push($stats, array(
-                'status' => $stat,
-                'name' => i($stat)
-            ));
+            if($this->trim) {
+                if($stat != 'spacer') {
+                    array_push($stats, array(
+                        'status' => $stat,
+                        'name' => i($stat)
+                    ));
+                }
+            } else {
+                array_push($stats, array(
+                    'status' => $stat,
+                    'name' => i($stat)
+                ));
+            }
         }
         return $stats;
     }
@@ -54,17 +68,26 @@ class Seatplan {
         $rowAmount = 60;
         $rows = array();
         for($count = 1; $count <= $rowAmount; $count++) {
-            $rows[$count] = self::getRow($count);
+            $row = self::getRow($count);
+            if(count($row) > 0) {
+                $rows[$count] = $row;
+            }
         }
         return $rows;
   }
 
     public function getRow($no) {
-        $columnAmount = 40;
         $name = 'A';
+        $columnAmount = 40;
         $columns = array();
         for($count = 1; $count <= $columnAmount; $count++) {
-            $columns[$name] = array('status' => $this->getSeatStatus($name, $no));
+            if($this->trim) {
+                if($this->getSeatStatus($name, $no) !== 'undefined') {
+                    $columns[$name] = array('status' => $this->getSeatStatus($name, $no));
+                }
+            } else {
+                $columns[$name] = array('status' => $this->getSeatStatus($name, $no));
+            }
             $name++;
         }
         return $columns;
@@ -90,6 +113,9 @@ class Seatplan {
     }
 
     public function toggleSeat($seat) {
+        if(! Auth::allowed('manage.forge-events', false)) {
+            return json_encode(array( "plan" => $newSeatplan->draw()));
+        }
         $db = App::instance()->db;
 
         $db->where('x', $seat['x']);

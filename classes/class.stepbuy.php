@@ -21,7 +21,12 @@ class SignupStepBuy {
     }
 
     private function getTicketStatus($userid) {
-        return '<span class="special">'.i('Available', 'forge-events').'</span>';
+        $collection = $this->event->getCollection();
+        if($collection->userTicketAvailable($this->event->id, $userid)) {
+            return '<span class="special">'.i('Available', 'forge-events').'</span>';
+        } else {
+            return '<span class="special">'.i('Purchased', 'forge-events').'</span>';
+        }
     }
 
     public function getTd() {
@@ -40,15 +45,18 @@ class SignupStepBuy {
     }
 
     public function getAction() {
-        return '<a href="#" class="btn btn-discreet payment-trigger" 
-            data-redirect-success="'.Utils::getCurrentUrl().'"
-            data-redirect-cancel="'.Utils::getCurrentUrl().'"
-            data-collection-item="'.$this->event->id.'"
-            data-payment-meta="'.urlencode(json_encode(array("ticket-type" => "default"))).'"
-            data-price-field="price"
-            data-title="'.$this->event->getMeta('title').'"
-            data-api="'.Utils::getHomeUrl()."api/".'"
-        >Buy</a>';
+        $collection = $this->event->getCollection();
+        $userid = App::instance()->user->get('id');
+        if($collection->userTicketAvailable($this->event->id, $userid)) {
+            return '<a href="#" class="btn btn-discreet payment-trigger" 
+                    data-redirect-success="'.Utils::getCurrentUrl().'"
+                    data-redirect-cancel="'.Utils::getCurrentUrl().'"
+                    data-collection-item="'.$this->event->id.'"
+                    data-payment-meta="'.urlencode(json_encode(array("ticket-type" => "default"))).'"
+                    data-price-field="price"
+                    data-title="'.$this->event->getMeta('title').'"
+                    data-api="'.Utils::getHomeUrl()."api/".'">Buy</a>';
+        }
     }
 
     public function getTr() {

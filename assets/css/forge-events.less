@@ -46,6 +46,11 @@
             background-color: #607D8B;
             border-color: #455A64;
         }
+
+        &.sold {
+            background-color: #FFC107;
+            border-color: #FF8F00;
+        }
     }
 
     .name {
@@ -94,5 +99,25 @@
     .totals, .checkout {
         display: flex;
         justify-content: flex-end;
+    }
+}
+
+.buyed-seats {
+    margin-top: 30px;
+    margin-bottom: 60px;
+}
+.step-seat {
+    ul li {
+        height: 30px;
+        background-color: rgba(255,255,255,0.1);
+        line-height: 30px;
+        padding-bottom: 10px;
+
+        input {
+            margin-right: 10px;
+            margin-left: 10px;
+            position: relative;
+            top: 2px;
+        }
     }
 }

@@ -26,6 +26,19 @@ class ForgeEventCollection extends DataCollection {
     return $return;
   }
 
+  public function userTicketAvailable($id, $user) {
+    $db = App::instance()->db;
+    $db->where("user", $user);
+    $db->where("collection_item", $id);
+    $db->where("status", "success");
+    $entry = $db->getOne("forge_payment_orders");
+    if($entry) {
+        return false;
+    } else {
+        return true;
+    }
+  }
+
   private function seatPlan() {
     $sp = new Seatplan($this->item_id);
     return $sp->draw();

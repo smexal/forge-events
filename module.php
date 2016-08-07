@@ -32,10 +32,6 @@ class ForgeEvents extends Module {
     }
 
     public function apiAdapter($data) {
-        if(! Auth::allowed($this->permission, false)) {
-            return false;
-        }
-
         switch($data['query'][0]) {
             case 'seatplan':
                 $sp = new Seatplan($data['data']['event']);
