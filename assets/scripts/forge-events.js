@@ -14,13 +14,19 @@ var forgeEvents = {
                 $(this).find(".cell").each(function() {
                     $(this).on("click", function() {
                         var seat = $(this).data('cell-id');
+                        var seatReservation = $("input[name='forge-events-user-to-set']");
+                        reservationRequest = '';
+                        if(seatReservation.length > 0) {
+                            var reservationRequest = seatReservation.data('user-id');
+                        }
                         $.ajax({
                             method: "POST",
                             url: apiUrl,
                             data: {
                                 'x' : seat,
                                 'y' : row,
-                                'event' : eventId
+                                'event' : eventId,
+                                'reservation' : reservationRequest
                             }
                         }).done(function(data) {
                             plan.remove();

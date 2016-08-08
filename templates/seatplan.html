@@ -22,7 +22,7 @@
     <div class="s-row" data-row-id="{$key}">
         <div class="name">{$key}</div>
         {loop="value"}
-        <div class="cell {$value.status}" data-cell-id="{$key}"></div>
+        <div class="cell {$value.status} {if="$value.tooltip"}tipster{/if}" data-cell-id="{$key}" title="{$value.tooltip}"></div>
         {/loop}
         <div class="name">{$key}</div>
     </div>

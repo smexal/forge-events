@@ -26,7 +26,10 @@ class ForgeEvents extends Module {
 
         // frontend
         App::instance()->tm->theme->addScript($this->url()."assets/scripts/forge-events.js", true);
+        App::instance()->tm->theme->addScript(CORE_WWW_ROOT."scripts/externals/tooltipster.bundle.min.js", true);
+
         App::instance()->tm->theme->addStyle(MOD_ROOT."forge-events/assets/css/forge-events.less");
+        App::instance()->tm->theme->addStyle(CORE_WWW_ROOT."css/externals/tooltipster.bundle.min.css");
 
         API::instance()->register('forge-events', array($this, 'apiAdapter'));
     }
