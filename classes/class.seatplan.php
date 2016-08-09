@@ -188,7 +188,7 @@ class Seatplan {
                 $this->saveReservation($seat['reservation'], $seat['x'], $seat['y'], $payment['id'], $seat['event']);
             }
         }
-        if(! Auth::allowed('manage.forge-events', false)) {
+        if(! Auth::allowed('manage.forge-events', false) || $seat['reservation']) {
             $newSeatplan = new Seatplan($seat['event'], true);
             return json_encode(array( "plan" => $newSeatplan->draw()));
         }

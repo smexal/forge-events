@@ -12,8 +12,22 @@ class SignupStepBuy {
         return App::instance()->render(MOD_ROOT."forge-events/templates/steps/", "buy", array(
             'title' => i('Your Tickets', 'forge-events'),
             'tr' => $this->getTr(),
-            'td' => $this->getTd()
+            'td' => $this->getTd(),
+            'other_user_title' => i('Buy for another user'),
+            'other_user_desc' => i('Buy a ticket for another user, by typing a valid user\'s E-Mail.'),
+            'add_user_form' => $this->getUserAddInput()
         ));
+    }
+
+    private function getUserAddInput() {
+        $form = Fields::text(array(
+            'key' => 'buy-for-another-user',
+            'label' => i('User E-Mail'),
+        ));
+
+        $form.= Fields::button(i('Add to list'), 'discreet');
+
+        return $form;
     }
 
     private function getTotal() {

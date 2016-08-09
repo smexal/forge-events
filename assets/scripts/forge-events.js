@@ -13,6 +13,7 @@ var forgeEvents = {
                 var row = $(this).data('row-id');
                 $(this).find(".cell").each(function() {
                     $(this).on("click", function() {
+                        plan.addClass("loading");
                         var seat = $(this).data('cell-id');
                         var seatReservation = $("input[name='forge-events-user-to-set']");
                         reservationRequest = '';

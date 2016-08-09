@@ -3,6 +3,11 @@
     border-radius: 5px;
     padding: 10px;
     margin-bottom: 30px;
+    position: relative;
+
+    &.loading .cell {
+        opacity: .1;
+    }
 
     .legend {
         display: flex;
@@ -20,6 +25,7 @@
     }
 
     .cell, .name {
+        transition: 300ms;
         width: 17px;
         height: 17px;
         background-color: #FAFAFA;
@@ -118,6 +124,20 @@
             margin-left: 10px;
             position: relative;
             top: 2px;
+        }
+    }
+}
+
+.add-user {
+    margin-top: 60px;
+    width: 50%;
+
+    form {
+        display: flex;
+        justify-content: space-between;
+
+        .form-group:first-child {
+            width: 70%;
         }
     }
 }
