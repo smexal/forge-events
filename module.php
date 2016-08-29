@@ -39,6 +39,8 @@ class ForgeEvents extends Module {
             case 'seatplan':
                 $sp = new Seatplan($data['data']['event']);
                 return $sp->handleRequest($data['query'], $data['data']);
+            case 'ticket-buy':
+                return json_encode(array('a' => 'b'));
             default:
                 return false;
         }

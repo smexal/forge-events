@@ -15,6 +15,7 @@ class SignupStepBuy {
             'td' => $this->getTd(),
             'other_user_title' => i('Buy for another user'),
             'other_user_desc' => i('Buy a ticket for another user, by typing a valid user\'s E-Mail.'),
+            'other_user_url' => Utils::getUrl(array('api', 'forge-events', 'ticket-buy', 'another-user')),
             'add_user_form' => $this->getUserAddInput()
         ));
     }
@@ -24,7 +25,6 @@ class SignupStepBuy {
             'key' => 'buy-for-another-user',
             'label' => i('User E-Mail'),
         ));
-
         $form.= Fields::button(i('Add to list'), 'discreet');
 
         return $form;

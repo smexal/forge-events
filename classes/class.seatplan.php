@@ -112,7 +112,26 @@ class Seatplan {
         if($status == 'spacer') {
             return false;
         }
+        $user = false;
+        if($status == 'sold') {
+            $user = $this->getSoldUser($name, $no);
+        }
+        if($user) {
+            $status = sprintf(i('Sold to %s', 'forge-events'), $user->get('username'));
+        }
         return $name.':'.$no.' - '.i($status);
+    }
+
+    public function getSoldUser($x, $y) {
+        $db = App::instance()->db;
+        $db->where('event_id', $this->event);
+        $db->where('x', $x);
+        $db->where('y', $y);
+        $seat = $db->getOne('forge_events_seat_reservations');
+        if($seat) {
+            return new User($seat['user']);
+        }
+        return false;
     }
 
     public function getSeatStatus($x, $y) {
