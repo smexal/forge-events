@@ -5,6 +5,10 @@ class SignupStepBuy {
     private $event = false;
 
     public function __construct($event) {
+        if(is_numeric($event)) {
+            $collection = App::instance()->cm->getCollection('forge-events');
+            $this->event = $collection->getItem($event);
+        }
         $this->event = $event;
     }
 
@@ -15,9 +19,13 @@ class SignupStepBuy {
             'td' => $this->getTd(),
             'other_user_title' => i('Buy for another user'),
             'other_user_desc' => i('Buy a ticket for another user, by typing a valid user\'s E-Mail.'),
-            'other_user_url' => Utils::getUrl(array('api', 'forge-events', 'ticket-buy', 'another-user')),
+            'other_user_url' => Utils::getUrl(array('api', 'forge-events', 'ticket-buy', $this->event->id, 'another-user')),
             'add_user_form' => $this->getUserAddInput()
         ));
+    }
+
+    public function addAnotherUser($usermail = false) {
+        return json_encode(array("proceed" => $usermail));
     }
 
     private function getUserAddInput() {

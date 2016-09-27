@@ -47,7 +47,7 @@ class SignupStepUser {
             'login' => array(
                 'title' => i('Login', 'forge-events'),
                 'intro' => i('You have to login with a verified user to buy a ticket.', 'forge-events'),
-                'form' => Login::instance()->form()
+                'form' => Login::instance()->form(false)
             ),
             'register' => array(
                 'title' => i('Registration', 'forge-events'),

@@ -40,7 +40,10 @@ class ForgeEvents extends Module {
                 $sp = new Seatplan($data['data']['event']);
                 return $sp->handleRequest($data['query'], $data['data']);
             case 'ticket-buy':
-                return json_encode(array('a' => 'b'));
+                $step = new SignupStepBuy($data['query'][1]);
+                if($data['query'][2] == 'another-user') {
+                    return $step->addAnotherUser($data['data']['buy-for-another-user']);
+                }
             default:
                 return false;
         }
