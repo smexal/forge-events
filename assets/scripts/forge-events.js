@@ -16,10 +16,13 @@ var forgeEvents = {
                         plan.addClass("loading");
                         var seat = $(this).data('cell-id');
                         var seatReservation = $("input[name='forge-events-user-to-set']");
-                        reservationRequest = '';
-                        if(seatReservation.length > 0) {
-                            var reservationRequest = seatReservation.data('user-id');
-                        }
+                        var reservationRequest = '';
+                        seatReservation.each(function() {
+                            if($(this).is(':checked')) {
+                                reservationRequest = $(this).data('user-id');
+                            }
+                        });
+
                         $.ajax({
                             method: "POST",
                             url: apiUrl,

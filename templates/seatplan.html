@@ -22,7 +22,12 @@
     <div class="s-row" data-row-id="{$key}">
         <div class="name">{$key}</div>
         {loop="value"}
-        <div class="cell {$value.status} {if="$value.tooltip"}tipster{/if}" data-cell-id="{$key}" title="{$value.tooltip}"></div>
+        <div 
+            class="cell {$value.status} 
+            {if="$value.tipurl"}tipster-ajax{/if}" 
+            tip-url="{$value.tipurl}" 
+            data-cell-id="{$key}">
+        </div>
         {/loop}
         <div class="name">{$key}</div>
     </div>

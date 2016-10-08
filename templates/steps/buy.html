@@ -1,20 +1,5 @@
 <div class="step-buy">
-    <table class="content-table">
-        <tr>
-        {loop="tr"}
-            <th>
-            {$value.name}
-            </th>
-        {/loop}
-        </tr>
-        {loop="td"}
-        <tr>
-            {loop="value"}
-                <td>{$value}</td>
-            {/loop}
-        </tr>
-        {/loop}
-    </table>
+    {$table}
     <div class="add-user">
         <h3>{$other_user_title}</h3>
         <p>{$other_user_desc}</p>

@@ -28,7 +28,7 @@ class SignupStepSeat {
         $buyed_seats = array();
         foreach($orders as $order) {
             if($order['collection_item'] == $this->event->id) {
-                $user = new User($order['user']);
+                $user = new User($order['meta']->{'ticket-user'});
                 array_push($buyed_seats, array(
                     "user" => $user->get('username') .' <small>'. $this->getUserSeat($user->get('id')).'</small>',
                     "id" => $user->get('id')
