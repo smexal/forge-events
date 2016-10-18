@@ -67,7 +67,14 @@ class SignupStepBuy {
 
     public function addAnotherUser($usermail = false) {
         if(!Utils::isEmail($usermail)) {
-            return array("error" => i('Invalid E-mail Address', 'forge-events'));
+            return array(
+                "errors" => array(
+                    array(
+                        'message' => i('Invalid E-Mail Address.', 'forge-events'),
+                        'field' => 'buy-for-another-user'
+                    )
+                )
+            );
         }
         $userid = User::exists($usermail);
         if($userid == App::instance()->user->get('id')) {
@@ -77,14 +84,28 @@ class SignupStepBuy {
         if($userid) {
             $user = new User($userid);
             if($user->get('active') == 0) {
-                return array("error" => i('The user you are looking for has not activated its account.'));
+                return array(
+                    "errors" => array(
+                        array(
+                            'message' => i('The user you are looking for has not activated its account.', 'forge-events'),
+                            'field' => 'buy-for-another-user'
+                        )
+                    )
+                );
             } else {
                 // we're all set.
                 $this->saveBuyOption($usermail);
                 return array("action" => "reload-specific", "target" => "#ticket-buy-table");
             }
         } else {
-            return array("error" => i('There is no user with this E-Mail Address', 'forge-events'));
+            return array(
+                "errors" => array(
+                    array(
+                        'message' => i('There is no user, with this given E-Mail Address.', 'forge-events'),
+                        'field' => 'buy-for-another-user'
+                    )
+                )
+            );
         }
         return array();
     }
@@ -161,7 +182,7 @@ class SignupStepBuy {
                     if(! is_array($ticketUser)) {
                         $ticketUser = array();
                     }
-                    array_push($ticketUser, $user);
+                    array_push($ticketUser, User::exists($user));
                 }
             }
             if(is_array($ticketUser)) {

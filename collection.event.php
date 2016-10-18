@@ -28,13 +28,20 @@ class ForgeEventCollection extends DataCollection {
 
   public function userTicketAvailable($id, $user) {
     $db = App::instance()->db;
-    $db->where("collection_item", $id);
     $db->where("status", "success");
     $orders = $db->get("forge_payment_orders");
     foreach($orders as $order) {
         $orderMeta = json_decode(urldecode($order['meta']));
-        if($orderMeta->{'ticket-user'} == $user) {
-            return false;
+        foreach($orderMeta->{'items'} as $itemInOrder) {
+            if(!is_numeric($user)) {
+                $user = User::exists($user);
+            }
+            if(!is_numeric($user)) {
+                return false;
+            }
+            if($itemInOrder->user == $user && $itemInOrder->collection == $id) {
+                return false;
+            }
         }
     }
     return true;
