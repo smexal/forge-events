@@ -30,8 +30,39 @@ class SignupStepBuy {
                 "api", "forge-events", "ticket-buy", $this->event->id, "buy-table"
             )),
             'tr' => $this->getTr(),
-            'td' => $this->getTds()
+            'td' => $this->getTds(),
+            'tb' => $this->getTb()
         ));
+    }
+
+    private function getTb() {
+        if(! array_key_exists('savedUsers', $_SESSION)) {
+            return false;
+        }
+        $users = $_SESSION['savedUsers'];
+        array_push($users, App::instance()->user->get('id'));
+
+        return array(
+            'colspan' => 4,
+            'label' => i('Total amount'),
+            'total' => $this->getTotalAmount($users),
+            'bbuyall' => $this->getAction($users)
+        );
+    }
+
+    public function getTotalAmount($users) {
+        $price = 0;
+        $collection = $this->event->getCollection();
+        foreach($users as $user) {
+            if($collection->userTicketAvailable($this->event->id, $user)) {
+                $price += $this->event->getMeta('price');
+            }
+        }
+        if($price == 0) {
+            return '-';
+        } else {
+            return Utils::formatAmount($price);
+        }
     }
 
     public function addAnotherUser($usermail = false) {
@@ -80,10 +111,6 @@ class SignupStepBuy {
         return $form;
     }
 
-    private function getTotal() {
-        return  Utils::formatAmount($this->event->getMeta('price'));
-    }
-
     private function getTicketStatus($userid) {
         $collection = $this->event->getCollection();
         if($collection->userTicketAvailable($this->event->id, $userid)) {
@@ -124,19 +151,48 @@ class SignupStepBuy {
         );
     }
 
-    public function getAction($userid) {
+    public function getAction($users) {
         $collection = $this->event->getCollection();
-        if($collection->userTicketAvailable($this->event->id, $userid)) {
-            return '<a href="#" class="btn btn-discreet payment-trigger" 
-                    data-redirect-success="'.Utils::getCurrentUrl().'"
-                    data-redirect-cancel="'.Utils::getCurrentUrl().'"
-                    data-collection-item="'.$this->event->id.'"
-                    data-payment-meta="'.urlencode(json_encode(array(
-                        "ticket-user" => $userid
-                    ))).'"
-                    data-price-field="price"
-                    data-title="'.$this->event->getMeta('title').'"
-                    data-api="'.Utils::getHomeUrl()."api/".'">Buy</a>';
+        $ticketUser = false;
+        if(is_array($users)) {
+            // buy ticket for multiple users...
+            foreach($users as $user) {
+                if($collection->userTicketAvailable($this->event->id, $user)) {
+                    if(! is_array($ticketUser)) {
+                        $ticketUser = array();
+                    }
+                    array_push($ticketUser, $user);
+                }
+            }
+            if(is_array($ticketUser)) {
+                $label = i('Buy all', 'forge-events');
+            }
+
+
+        } else {
+            // buy only one ticket
+            if($collection->userTicketAvailable($this->event->id, $users)) {
+                $ticketUser = array($users);
+                $label = i('Buy', 'forge-events');
+            }
+        }
+
+        if($ticketUser) {
+            $items = array();
+            foreach($ticketUser as $user) {
+                array_push($items, array(
+                    'collection' => $this->event->id,
+                    'user' => $user,
+                    'amount' => 1
+                ));
+            }
+            return Payment::button(array(
+                "items" => $items,
+                "title" => $this->event->getMeta('title'),
+                "label" => $label
+            ));
+        } else {
+            return false;
         }
     }
 

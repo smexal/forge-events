@@ -1,0 +1,28 @@
+<table id="ticket-buy-table" ajax-url="{$buytableurl}" class="content-table">
+    <tr>
+    {loop="tr"}
+        <th>
+        {$value.name}
+        </th>
+    {/loop}
+    </tr>
+    {loop="td"}
+    <tr>
+        {loop="value"}
+            <td>{$value}</td>
+        {/loop}
+    </tr>
+    {/loop}
+    {if="$tb"}
+        <tfoot>
+        <tr>
+            <th class="sum" colspan="{$tb.colspan}">{$tb.label}</th>
+            <th class="total">{$tb.total}</th>
+        </tr>
+        <tr>
+            <td colspan="{$tb.colspan}"></td>
+            <td>{$tb.bbuyall}</td>
+        </tr>
+        </tfoot>
+    {/if}
+</table>
