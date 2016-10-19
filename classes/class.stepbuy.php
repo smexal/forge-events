@@ -135,7 +135,7 @@ class SignupStepBuy {
     private function getTicketStatus($userid) {
         $collection = $this->event->getCollection();
         if($collection->userTicketAvailable($this->event->id, $userid)) {
-            return '<span class="special">'.i('Available', 'forge-events').'</span>';
+            return '<span class="special">'.i('Unpaid', 'forge-events').'</span>';
         } else {
             return '<span class="special">'.i('Purchased', 'forge-events').'</span>';
         }

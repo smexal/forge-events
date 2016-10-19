@@ -27,12 +27,14 @@ class SignupStepSeat {
         $orders = Payment::getPayments(App::instance()->user->get('id'));
         $buyed_seats = array();
         foreach($orders as $order) {
-            if($order['collection_item'] == $this->event->id) {
-                $user = new User($order['meta']->{'ticket-user'});
-                array_push($buyed_seats, array(
-                    "user" => $user->get('username') .' <small>'. $this->getUserSeat($user->get('id')).'</small>',
-                    "id" => $user->get('id')
-                ));
+            foreach($order['meta']->items as $item) {
+                if($item->collection == $this->event->id) {
+                    $user = new User($item->user);
+                    array_push($buyed_seats, array(
+                        "user" => $user->get('username') .' <small>'. $this->getUserSeat($user->get('id')).'</small>',
+                        "id" => $item->user
+                    ));
+                }
             }
         }
         return $buyed_seats;

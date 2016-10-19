@@ -216,16 +216,18 @@ class Seatplan {
 
             $ordersOfThisUser = Payment::getPayments(App::instance()->user->get('id'));
             foreach($ordersOfThisUser as $order) {
-                if($order['meta']->{'ticket-user'} == $seat['reservation']
-                    && $order['collection_item'] == $seat['event']) {
+                foreach($order['meta']->items as $item) {
+                    if($item->user == $seat['reservation']
+                    && $item->collection == $seat['event']) {
 
-                    $this->saveReservation(
-                        $seat['reservation'], 
-                        $seat['x'], 
-                        $seat['y'], 
-                        $order['id'], 
-                        $seat['event']
-                    );
+                        $this->saveReservation(
+                            $seat['reservation'], 
+                            $seat['x'], 
+                            $seat['y'], 
+                            $order['id'], 
+                            $seat['event']
+                        );
+                    }
                 }
             }
         }
