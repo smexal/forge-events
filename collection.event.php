@@ -2,14 +2,14 @@
 class ForgeEventCollection extends DataCollection {
   public $permission = "manage.collection.sites";
 
-  private $item_id = null;
+  private $itemId = null;
 
   protected function setup() {
     $this->preferences['name'] = 'forge-events';
     $this->preferences['title'] = i('Events', 'forge-events');
     $this->preferences['all-title'] = i('Manage Events', 'forge-events');
     $this->preferences['add-label'] = i('Add event', 'forge-events');
-    $this->preferences['single-item'] = i('Collection', 'forge-events');
+    $this->preferences['single-item'] = i('Event', 'forge-events');
 
     $this->custom_fields();
   }
@@ -18,13 +18,28 @@ class ForgeEventCollection extends DataCollection {
   }
 
   public function customEditContent($id) {
-    $this->item_id = $id;
+    $this->itemId = $id;
 
     $return = '';
     $return.= $this->seatPlan();
 
     return $return;
   }
+
+  public function getSubnavigation() {
+    return [
+        [
+            'url' => 'tickets',
+            'title' => i('Ticket Status')
+        ]
+    ];
+  }
+
+  public function subviewTickets($itemId) {
+    $ticketTable = new TicketTable($itemId);
+    return $ticketTable->draw();
+  }
+
 
   public function userTicketAvailable($id, $user) {
     $db = App::instance()->db;
@@ -48,7 +63,7 @@ class ForgeEventCollection extends DataCollection {
   }
 
   private function seatPlan() {
-    $sp = new Seatplan($this->item_id);
+    $sp = new Seatplan($this->itemId);
     return $sp->draw();
   }
 
