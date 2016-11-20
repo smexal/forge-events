@@ -13,6 +13,8 @@ class ForgeEvents extends Module {
 
     public function start() {
         Auth::registerPermissions($this->permission);
+        Auth::registerPermissions("manage.forge-events.ticket-status.view");
+        Auth::registerPermissions("manage.forge-events.ticket-status.edit");
 
         // always load these files
         Loader::instance()->loadDirectory(MOD_ROOT."forge-events/classes/");
