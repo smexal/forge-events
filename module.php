@@ -6,7 +6,7 @@ class ForgeEvents extends Module {
     public function setup() {
         $this->version = '0.1.0';
         $this->id = "forge-events";
-        $this->name = i('Forge Events', 'forge-events');
+        $this->name = i('Event Management', 'forge-events');
         $this->description = i('Event Management for Forge.', 'forge-events');
         $this->image = $this->url().'assets/images/module-image.png';
     }

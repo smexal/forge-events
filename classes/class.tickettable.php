@@ -58,13 +58,13 @@ class TicketTable {
                 Utils::tableCell($order->data['status']),
                 Utils::tableCell(Utils::formatAmount($order->data['price'])),
                 Utils::tableCell($order->getItemAmount()),
-                Utils::tableCell($this->actions($order->data['id']))
+                Utils::tableCell($this->actions($order))
             ));
         }
         return $ordersEnriched;
     }
 
-    private function actions($id) {
+    private function actions($order) {
         if(!Auth::allowed("manage.forge-events.ticket-status.edit")) {
             return;
         }
@@ -73,7 +73,7 @@ class TicketTable {
             true,
             [
                 'event' => $this->event,
-                'order' => $id
+                'order' => $order->data['id']
             ]
         );
 
@@ -82,28 +82,33 @@ class TicketTable {
             true,
             [
                 'event' => $this->event,
-                'order' => $id
+                'order' => $order->data['id']
             ]
         );
 
-        return App::instance()->render(CORE_TEMPLATE_DIR."assets/", "table.actions", array(
-            'actions' => array(
-                array(
-                    "url" => $acceptUrl,
-                    "icon" => "ok",
-                    "name" => i('Accept order', 'forge-events'),
-                    "ajax" => true,
-                    "confirm" => false
-                ),
-                array(
-                    "url" => $deleteUrl,
-                    "icon" => "trash",
-                    "name" => i('Delete order', 'forge-events'),
-                    "ajax" => true,
-                    "confirm" => false
-                )
-            )
-        ));
+        $actions = [
+            'actions' => []
+        ];
+
+        if($order->data['status'] != 'success') {
+            array_push($actions['actions'], [
+                "url" => $acceptUrl,
+                "icon" => "ok",
+                "name" => i('Accept order', 'forge-events'),
+                "ajax" => true,
+                "confirm" => false
+            ]);
+        }
+
+        array_push($actions['actions'], [
+            "url" => $deleteUrl,
+            "icon" => "trash",
+            "name" => i('Delete order', 'forge-events'),
+            "ajax" => true,
+            "confirm" => false
+        ]);
+
+        return App::instance()->render(CORE_TEMPLATE_DIR."assets/", "table.actions", $actions);
     }
 }
 
