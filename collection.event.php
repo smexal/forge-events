@@ -12,54 +12,6 @@ class ForgeEventCollection extends DataCollection {
 
         $this->custom_fields();
 
-        API::instance()->register('forge-events-tickets', array($this, 'ticketApiAdapter'));
-    }
-
-    public function ticketApiAdapter($args) {
-        switch($args) {
-            case 'clear-drafts':
-                return $this->clearDrafts();
-                break;
-            case 'delete-order':
-                return $this->deleteOrder();
-                break;
-            case 'accept-order':
-                return $this->acceptOrder();
-                break;
-        }
-    }
-
-    private function acceptOrder() {
-        $ticketTable = new TicketTable($_GET['event']);
-        Payment::acceptOrder($_GET['order']);
-
-        return json_encode([
-            'action' => 'update',
-            'target' => $ticketTable->tableId,
-            'content' => $ticketTable->draw()
-        ]);
-    }
-
-    private function deleteOrder() {
-        $ticketTable = new TicketTable($_GET['event']);
-        Payment::deleteOrder($_GET['order']);
-
-        return json_encode([
-            'action' => 'update',
-            'target' => $ticketTable->tableId,
-            'content' => $ticketTable->draw()
-        ]);
-    }
-
-    private function clearDrafts() {
-        $ticketTable = new TicketTable($_GET['event']);
-        $ticketTable->removeDrafts();
-
-        return json_encode([
-            'action' => 'update',
-            'target' => $ticketTable->tableId,
-            'content' => $ticketTable->draw()
-        ]);
     }
 
     public function render($item) {
@@ -74,37 +26,36 @@ class ForgeEventCollection extends DataCollection {
         return $return;
     }
 
+    /*
+    * Deprecated just for "demo" purposes...
+    * Adds a subnavigation for the collection 
     public function getSubnavigation() {
-        if(! Auth::allowed("manage.forge-events.ticket-status.view")) {
-            return;
-        }
         return [
             [
             'url' => 'tickets',
-            'title' => i('Ticket Status')
+            'title' => i('Subnavigation')
             ]
         ];
+        
     }
 
     public function subviewTickets($itemId) {
         if(! Auth::allowed("manage.forge-events.ticket-status.view")) {
             return;
         }
-        $ticketTable = new TicketTable($itemId);
-        return $ticketTable->draw();
+        return "hello subview";
     }
 
     public function subviewTicketsActions($itemId) {
-        if(! Auth::allowed("manage.forge-events.ticket-status.edit")) {
-            return;
-        }
         $url = Utils::getUrl(
             ['api', 'forge-events-tickets', 'clear-drafts'],
             true,
             array('event' => $itemId)
         );
-        return '<a class="ajax btn btn-xs" href="'.$url.'">'.i('Clear drafts', 'forge-events').'</a>';
+        return '<a class="ajax btn btn-xs" href="'.$url.'">'.i('an action', 'forge-events').'</a>';
     }
+    
+    */
 
 
     public function userTicketAvailable($id, $user) {
@@ -139,7 +90,7 @@ class ForgeEventCollection extends DataCollection {
                 'key' => 'amount-of-participants',
                 'label' => i('Number of participants', 'forge-events'),
                 'multilang' => true,
-                'type' => 'text',
+                'type' => 'number',
                 'order' => 20,
                 'position' => 'right',
                 'hint' => ''
@@ -157,17 +108,8 @@ class ForgeEventCollection extends DataCollection {
                 'key' => 'start-date',
                 'label' => i('Start Date', 'forge-events'),
                 'multilang' => true,
-                'type' => 'text',
+                'type' => 'datetime',
                 'order' => 25,
-                'position' => 'right',
-                'hint' => ''
-                ),
-            array(
-                'key' => 'start-time',
-                'label' => i('Start Time', 'forge-events'),
-                'multilang' => true,
-                'type' => 'text',
-                'order' => 26,
                 'position' => 'right',
                 'hint' => ''
                 ),
@@ -175,16 +117,7 @@ class ForgeEventCollection extends DataCollection {
                 'key' => 'end-date',
                 'label' => i('End Date', 'forge-events'),
                 'multilang' => true,
-                'type' => 'text',
-                'order' => 30,
-                'position' => 'right',
-                'hint' => ''
-                ),
-            array(
-                'key' => 'end-time',
-                'label' => i('End Time', 'forge-events'),
-                'multilang' => true,
-                'type' => 'text',
+                'type' => 'datetime',
                 'order' => 30,
                 'position' => 'right',
                 'hint' => ''
@@ -193,7 +126,7 @@ class ForgeEventCollection extends DataCollection {
                 'key' => 'price',
                 'label' => i('Event Price', 'forge-events'),
                 'multilang' => true,
-                'type' => 'text',
+                'type' => 'number',
                 'order' => 19,
                 'position' => 'right',
                 'hint' => ''
