@@ -1,6 +1,10 @@
-<?
+<?php
 
-class ForgeEvents extends Module {
+namespace Forge\Modules\ForgeEvents;
+
+use \Forge\Core\Abstracts as Abstracts;
+
+class ForgeEvents extends Abstracts\Module {
     private $permission = 'manage.forge-events';
 
     public function setup() {
