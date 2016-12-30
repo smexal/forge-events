@@ -40,13 +40,18 @@ class SignupStepSeat {
         return $buyed_seats;
     }
 
-    private function getUserSeat($user) {
+    public function getUserSeat($user) {
         $db = App::instance()->db;
-        $db->where('event_id', $this->event->id);
+        if(is_object($this->event)) {
+            $id = $this->event->id;
+        } else {
+            $id = $this->event;
+        }
+        $db->where('event_id', $id);
         $db->where('user', $user);
         $seat = $db->get('forge_events_seat_reservations');
         if(count($seat) > 0) {
-            return sprintf(i('(current seat: <strong>%s</strong>)'), $seat[0]['x'].':'.$seat[0]['y']);
+            return sprintf(i('<strong>%s</strong>'), $seat[0]['x'].':'.$seat[0]['y']);
         }
         return '';
     }
