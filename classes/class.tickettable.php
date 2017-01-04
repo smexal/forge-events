@@ -1,5 +1,16 @@
 <?
 
+namespace Forge\Modules\ForgeEvents;
+
+use \Forge\Core\App\App;
+use \Forge\Core\App\Auth;
+use \Forge\Core\Classes\User;
+use \Forge\Core\Classes\Utils;
+
+use \Forge\Modules\ForgePayment\Payment;
+
+use function \Forge\Core\Classes\i;
+
 class TicketTable {
     private $event;
     public $tableId = "ticketTable";
@@ -65,7 +76,7 @@ class TicketTable {
     }
 
     private function actions($order) {
-        if(!Auth::allowed("manage.forge-events.ticket-status.edit")) {
+        if(! Auth::allowed("manage.forge-events.ticket-status.edit")) {
             return;
         }
         $deleteUrl = Utils::getUrl(

@@ -1,11 +1,22 @@
 <?php
 
+namespace Forge\Modules\ForgeEvents;
+
+use \Forge\Core\App\App;
+use \Forge\Core\Classes\Fields;
+use \Forge\Core\Classes\User;
+use \Forge\Core\Classes\Utils;
+
+use \Forge\Modules\ForgePayment\Payment;
+
+use function \Forge\Core\Classes\i;
+
 class SignupStepBuy {
     public $id = 'signup-buy';
     private $event = false;
 
     public function __construct($event) {
-        if(is_numeric($event)) {
+        if (is_numeric($event)) {
             $collection = App::instance()->cm->getCollection('forge-events');
             $this->event = $collection->getItem($event);
         } else {
@@ -36,7 +47,7 @@ class SignupStepBuy {
     }
 
     private function getTb() {
-        if(! array_key_exists('savedUsers', $_SESSION)) {
+        if (! array_key_exists('savedUsers', $_SESSION)) {
             return false;
         }
         $users = $_SESSION['savedUsers'];
@@ -53,12 +64,12 @@ class SignupStepBuy {
     public function getTotalAmount($users) {
         $price = 0;
         $collection = $this->event->getCollection();
-        foreach($users as $user) {
-            if($collection->userTicketAvailable($this->event->id, $user)) {
+        foreach ($users as $user) {
+            if ($collection->userTicketAvailable($this->event->id, $user)) {
                 $price += $this->event->getMeta('price');
             }
         }
-        if($price == 0) {
+        if ($price == 0) {
             return '-';
         } else {
             return Utils::formatAmount($price);
@@ -66,7 +77,7 @@ class SignupStepBuy {
     }
 
     public function addAnotherUser($usermail = false) {
-        if(!Utils::isEmail($usermail)) {
+        if (!Utils::isEmail($usermail)) {
             return array(
                 "errors" => array(
                     array(
@@ -77,13 +88,13 @@ class SignupStepBuy {
             );
         }
         $userid = User::exists($usermail);
-        if($userid == App::instance()->user->get('id')) {
+        if ($userid == App::instance()->user->get('id')) {
             return array();
         }
 
-        if($userid) {
+        if ($userid) {
             $user = new User($userid);
-            if($user->get('active') == 0) {
+            if ($user->get('active') == 0) {
                 return array(
                     "errors" => array(
                         array(
@@ -111,12 +122,12 @@ class SignupStepBuy {
     }
 
     private function saveBuyOption($email) {
-        if(array_key_exists('savedUsers', $_SESSION) && !is_null($_SESSION['savedUsers'])) {
+        if (array_key_exists('savedUsers', $_SESSION) && !is_null($_SESSION['savedUsers'])) {
             $users = $_SESSION['savedUsers'];
         } else {
             $users = array();
         }
-        if(!in_array($email, $users)) {
+        if (!in_array($email, $users)) {
             array_push($users, $email);
         }
         $_SESSION['savedUsers'] = $users;
@@ -134,7 +145,7 @@ class SignupStepBuy {
 
     private function getTicketStatus($userid) {
         $collection = $this->event->getCollection();
-        if($collection->userTicketAvailable($this->event->id, $userid)) {
+        if ($collection->userTicketAvailable($this->event->id, $userid)) {
             return '<span class="special">'.i('Unpaid', 'forge-events').'</span>';
         } else {
             return '<span class="special">'.i('Purchased', 'forge-events').'</span>';
@@ -142,7 +153,7 @@ class SignupStepBuy {
     }
 
     public function getTds() {
-        if(is_null(App::instance()->user)) {
+        if (is_null(App::instance()->user)) {
             return '';
         }
         $rows = array();
@@ -150,8 +161,8 @@ class SignupStepBuy {
         // add current user
         array_push($rows, $this->getTd(App::instance()->user));
 
-        if(array_key_exists('savedUsers', $_SESSION) && is_array($_SESSION['savedUsers'])) {
-            foreach($_SESSION['savedUsers'] as $otherUser) {
+        if (array_key_exists('savedUsers', $_SESSION) && is_array($_SESSION['savedUsers'])) {
+            foreach ($_SESSION['savedUsers'] as $otherUser) {
                 $userid = User::exists($otherUser);
                 $user = new User($userid);
                 array_push($rows, $this->getTd($user));
@@ -164,9 +175,9 @@ class SignupStepBuy {
 
     private function getTd($user) {
         return array(
-            $this->getTicketStatus($user->get('id')), 
-            $user->get('username').' ('.$user->get('email').')', 
-            'default', 
+            $this->getTicketStatus($user->get('id')),
+            $user->get('username').' ('.$user->get('email').')',
+            'default',
             Utils::formatAmount($this->event->getMeta('price')),
             $this->getAction($user->get('id'))
         );
@@ -175,32 +186,32 @@ class SignupStepBuy {
     public function getAction($users) {
         $collection = $this->event->getCollection();
         $ticketUser = false;
-        if(is_array($users)) {
+        if (is_array($users)) {
             // buy ticket for multiple users...
-            foreach($users as $user) {
-                if($collection->userTicketAvailable($this->event->id, $user)) {
-                    if(! is_array($ticketUser)) {
+            foreach ($users as $user) {
+                if ($collection->userTicketAvailable($this->event->id, $user)) {
+                    if (! is_array($ticketUser)) {
                         $ticketUser = array();
                     }
                     array_push($ticketUser, User::exists($user));
                 }
             }
-            if(is_array($ticketUser)) {
+            if (is_array($ticketUser)) {
                 $label = i('Buy all', 'forge-events');
             }
 
 
         } else {
             // buy only one ticket
-            if($collection->userTicketAvailable($this->event->id, $users)) {
+            if ($collection->userTicketAvailable($this->event->id, $users)) {
                 $ticketUser = array($users);
                 $label = i('Buy', 'forge-events');
             }
         }
 
-        if($ticketUser) {
+        if ($ticketUser) {
             $items = array();
-            foreach($ticketUser as $user) {
+            foreach ($ticketUser as $user) {
                 array_push($items, array(
                     'collection' => $this->event->id,
                     'user' => $user,
@@ -242,10 +253,10 @@ class SignupStepBuy {
     }
 
     public function allowed() {
-        if(is_null(App::instance()->user)) {
+        if (is_null(App::instance()->user)) {
             return false;
         }
-        if(App::instance()->user->get('active') == 0) {
+        if (App::instance()->user->get('active') == 0) {
             return false;
         }
         return true;

@@ -1,10 +1,14 @@
-<?php 
+<?php
 
 namespace Forge\Modules\ForgeEvents;
 
-use Forge\Core\Abstracts as Abstracts;
+use \Forge\Core\Abstracts\View;
+use \Forge\Core\App\App;
+use \Forge\Core\Classes\Fields;
 
-class ForgeEventSignup extends Abstracts\View {
+use function \Forge\Core\Classes\i;
+
+class ForgeEventSignup extends View {
     public $name = 'event-signup';
     public $allowNavigation = true;
     private $event = null;
