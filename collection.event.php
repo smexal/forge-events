@@ -28,7 +28,7 @@ class ForgeEventCollection extends DataCollection {
 
     /*
     * Deprecated just for "demo" purposes...
-    * Adds a subnavigation for the collection 
+    * Adds a subnavigation for the collection */
     public function getSubnavigation() {
         return [
             [
@@ -54,7 +54,7 @@ class ForgeEventCollection extends DataCollection {
         );
         return '<a class="ajax btn btn-xs" href="'.$url.'">'.i('an action', 'forge-events').'</a>';
     }
-    
+    /*
     */
 
 

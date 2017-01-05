@@ -188,8 +188,6 @@ class SignupStepBuy {
             if(is_array($ticketUser)) {
                 $label = i('Buy all', 'forge-events');
             }
-
-
         } else {
             // buy only one ticket
             if($collection->userTicketAvailable($this->event->id, $users)) {
