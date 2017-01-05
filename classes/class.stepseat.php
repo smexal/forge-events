@@ -1,5 +1,14 @@
 <?php
 
+namespace Forge\Modules\ForgeEvents;
+
+use \Forge\Core\App\App;
+use \Forge\Core\Classes\User;
+
+use \Forge\Modules\ForgePayment\Payment;
+
+use function \Forge\Core\Classes\i;
+
 class SignupStepSeat {
     public $id = 'signup-seat';
     private $event = false;
@@ -79,8 +88,6 @@ class SignupStepSeat {
             return false;
         }
     }
-
-
 }
 
 ?>

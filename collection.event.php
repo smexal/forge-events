@@ -1,4 +1,15 @@
 <?php
+
+namespace Forge\Modules\ForgeEvents;
+
+use \Forge\Core\Abstracts\DataCollection;
+use \Forge\Core\App\App;
+use \Forge\Core\App\Auth;
+use \Forge\Core\Classes\User;
+use \Forge\Core\Classes\Utils;
+
+use function \Forge\Core\Classes\i;
+
 class ForgeEventCollection extends DataCollection {
     public $permission = "manage.collection.sites";
     private $itemId = null;
@@ -36,7 +47,7 @@ class ForgeEventCollection extends DataCollection {
             'title' => i('Subnavigation')
             ]
         ];
-        
+
     }
 
     public function subviewTickets($itemId) {
@@ -54,24 +65,21 @@ class ForgeEventCollection extends DataCollection {
         );
         return '<a class="ajax btn btn-xs" href="'.$url.'">'.i('an action', 'forge-events').'</a>';
     }
-    /*
-    */
-
 
     public function userTicketAvailable($id, $user) {
         $db = App::instance()->db;
         $db->where("status", "success");
         $orders = $db->get("forge_payment_orders");
-        foreach($orders as $order) {
+        foreach ($orders as $order) {
             $orderMeta = json_decode(urldecode($order['meta']));
-            foreach($orderMeta->{'items'} as $itemInOrder) {
-                if(!is_numeric($user)) {
+            foreach ($orderMeta->{'items'} as $itemInOrder) {
+                if (!is_numeric($user)) {
                     $user = User::exists($user);
                 }
-                if(!is_numeric($user)) {
+                if (!is_numeric($user)) {
                     return false;
                 }
-                if($itemInOrder->user == $user && $itemInOrder->collection == $id) {
+                if ($itemInOrder->user == $user && $itemInOrder->collection == $id) {
                     return false;
                 }
             }

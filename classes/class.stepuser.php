@@ -1,5 +1,13 @@
 <?php
 
+namespace Forge\Modules\ForgeEvents;
+
+use \Forge\Core\App\App;
+use \Forge\Core\Classes\Utils;
+use \Forge\Views\Login;
+
+use function \Forge\Core\Classes\i;
+
 class SignupStepUser {
     public $id = 'signup-user';
 
