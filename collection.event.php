@@ -11,18 +11,15 @@ use \Forge\Core\Classes\Utils;
 use function \Forge\Core\Classes\i;
 
 class ForgeEventCollection extends DataCollection {
-    public $permission = "manage.collection.sites";
+    public static $name = 'forge-events';
+    public static $permission = "manage.collection.sites";
     private $itemId = null;
 
     protected function setup() {
-        $this->preferences['name'] = 'forge-events';
         $this->preferences['title'] = i('Events', 'forge-events');
         $this->preferences['all-title'] = i('Manage Events', 'forge-events');
         $this->preferences['add-label'] = i('Add event', 'forge-events');
         $this->preferences['single-item'] = i('Event', 'forge-events');
-
-        $this->custom_fields();
-
     }
 
     public function render($item) {
@@ -92,7 +89,7 @@ class ForgeEventCollection extends DataCollection {
         return $sp->draw();
     }
 
-    private function custom_fields() {
+    public function customFields() {
         $this->addFields(array(
             array(
                 'key' => 'amount-of-participants',
