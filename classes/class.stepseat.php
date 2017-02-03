@@ -1,5 +1,14 @@
 <?php
 
+namespace Forge\Modules\ForgeEvents;
+
+use \Forge\Core\App\App;
+use \Forge\Core\Classes\User;
+
+use \Forge\Modules\ForgePayment\Payment;
+
+use function \Forge\Core\Classes\i;
+
 class SignupStepSeat {
     public $id = 'signup-seat';
     private $event = false;
@@ -27,24 +36,31 @@ class SignupStepSeat {
         $orders = Payment::getPayments(App::instance()->user->get('id'));
         $buyed_seats = array();
         foreach($orders as $order) {
-            if($order['collection_item'] == $this->event->id) {
-                $user = new User($order['meta']->{'ticket-user'});
-                array_push($buyed_seats, array(
-                    "user" => $user->get('username') .' <small>'. $this->getUserSeat($user->get('id')).'</small>',
-                    "id" => $user->get('id')
-                ));
+            foreach($order['meta']->items as $item) {
+                if($item->collection == $this->event->id) {
+                    $user = new User($item->user);
+                    array_push($buyed_seats, array(
+                        "user" => $user->get('username') .' <small>'. $this->getUserSeat($user->get('id')).'</small>',
+                        "id" => $item->user
+                    ));
+                }
             }
         }
         return $buyed_seats;
     }
 
-    private function getUserSeat($user) {
+    public function getUserSeat($user) {
         $db = App::instance()->db;
-        $db->where('event_id', $this->event->id);
+        if(is_object($this->event)) {
+            $id = $this->event->id;
+        } else {
+            $id = $this->event;
+        }
+        $db->where('event_id', $id);
         $db->where('user', $user);
         $seat = $db->get('forge_events_seat_reservations');
         if(count($seat) > 0) {
-            return sprintf(i('(current seat: <strong>%s</strong>)'), $seat[0]['x'].':'.$seat[0]['y']);
+            return sprintf(i('<strong>%s</strong>'), $seat[0]['x'].':'.$seat[0]['y']);
         }
         return '';
     }
@@ -72,8 +88,6 @@ class SignupStepSeat {
             return false;
         }
     }
-
-
 }
 
 ?>

@@ -1,5 +1,7 @@
 <?php
 
+namespace Forge\Modules\ForgeEvents;
+
 class Signup {
     private $steps = array();
     private $event = false;
@@ -27,7 +29,7 @@ class Signup {
     public function getSteps() {
         $contents = array();
         foreach($this->steps as $name => $step) {
-            array_push($contents, 
+            array_push($contents,
                 array(
                 'active' => $this->getActive() == $name ? true : false,
                 'disabled' => ! $step->allowed(),
@@ -39,18 +41,18 @@ class Signup {
     }
 
     private function getActive() {
-        if( $this->steps['user']->allowed() && 
-            $this->steps['buy']->allowed() && 
+        if( $this->steps['user']->allowed() &&
+            $this->steps['buy']->allowed() &&
             $this->steps['seat']->allowed()) {
             return 'seat';
         }
-        if( $this->steps['user']->allowed() && 
-            $this->steps['buy']->allowed() && 
+        if( $this->steps['user']->allowed() &&
+            $this->steps['buy']->allowed() &&
             ! $this->steps['seat']->allowed()) {
             return 'buy';
         }
-        if( $this->steps['user']->allowed() && 
-            ! $this->steps['buy']->allowed() && 
+        if( $this->steps['user']->allowed() &&
+            ! $this->steps['buy']->allowed() &&
             ! $this->steps['seat']->allowed()) {
             return 'user';
         }

@@ -1,5 +1,16 @@
 <?php
 
+namespace Forge\Modules\ForgeEvents;
+
+use \Forge\Core\App\App;
+use \Forge\Core\App\Auth;
+use \Forge\Core\Classes\User;
+use \Forge\Core\Classes\Utils;
+
+use \Forge\Modules\ForgePayment\Payment;
+
+use function \Forge\Core\Classes\i;
+
 class Seatplan {
     private $event = null;
     private $seatTable = 'forge_events_seats';
@@ -134,11 +145,10 @@ class Seatplan {
     }
 
     public function getSoldUser($x, $y) {
-        $db = App::instance()->db;
-        $db->where('event_id', $this->event);
-        $db->where('x', $x);
-        $db->where('y', $y);
-        $seat = $db->getOne('forge_events_seat_reservations');
+        $this->db->where('event_id', $this->event);
+        $this->db->where('x', $x);
+        $this->db->where('y', $y);
+        $seat = $this->db->getOne('forge_events_seat_reservations');
         if($seat) {
             return new User($seat['user']);
         }
@@ -147,9 +157,8 @@ class Seatplan {
 
     public function getSeatStatus($x, $y) {
         if(is_null($this->soldSeats)) {
-            $db = App::instance()->db;
-            $db->where('event_id', $this->event);
-            $this->soldSeats = $db->get('forge_events_seat_reservations');
+            $this->db->where('event_id', $this->event);
+            $this->soldSeats = $this->db->get('forge_events_seat_reservations');
         }
         foreach($this->seats as $seat) {
             if($seat['x'] == $x && $seat['y'] == $y) {
@@ -182,18 +191,17 @@ class Seatplan {
     }
 
     public function saveReservation($user, $x, $y, $order, $event) {
-        $db = App::instance()->db;
         // check if user already has a reservation, if yes. remove it.
-        $db->where('user', $user);
-        $db->where('event_id', $event);
-        $db->get('forge_events_seat_reservations');
-        if($db->count > 0) {
-            $db->where('user', $user);
-            $db->where('event_id', $event);
-            $db->delete('forge_events_seat_reservations');
+        $this->db->where('user', $user);
+        $this->db->where('event_id', $event);
+        $this->db->get('forge_events_seat_reservations');
+        if($this->db->count > 0) {
+            $this->db->where('user', $user);
+            $this->db->where('event_id', $event);
+            $this->db->delete('forge_events_seat_reservations');
         }
 
-        $db->insert('forge_events_seat_reservations', array(
+        $this->db->insert('forge_events_seat_reservations', array(
             "user" => $user,
             "x" => $x,
             "y" => $y,
@@ -201,8 +209,8 @@ class Seatplan {
             "event_id" => $event
         ));
 
-        $db->where('event_id', $this->event);
-        $this->soldSeats = $db->get('forge_events_seat_reservations');
+        $this->db->where('event_id', $this->event);
+        $this->soldSeats = $this->db->get('forge_events_seat_reservations');
     }
 
     public function toggleSeat($seat) {
@@ -216,16 +224,18 @@ class Seatplan {
 
             $ordersOfThisUser = Payment::getPayments(App::instance()->user->get('id'));
             foreach($ordersOfThisUser as $order) {
-                if($order['meta']->{'ticket-user'} == $seat['reservation']
-                    && $order['collection_item'] == $seat['event']) {
+                foreach($order['meta']->items as $item) {
+                    if($item->user == $seat['reservation']
+                    && $item->collection == $seat['event']) {
 
-                    $this->saveReservation(
-                        $seat['reservation'], 
-                        $seat['x'], 
-                        $seat['y'], 
-                        $order['id'], 
-                        $seat['event']
-                    );
+                        $this->saveReservation(
+                            $seat['reservation'],
+                            $seat['x'],
+                            $seat['y'],
+                            $order['id'],
+                            $seat['event']
+                        );
+                    }
                 }
             }
         }
@@ -235,26 +245,25 @@ class Seatplan {
         }
 
         // admin toggle
-        $db = App::instance()->db;
 
-        $db->where('x', $seat['x']);
-        $db->where('y', $seat['y']);
-        $data = $db->getOne($this->seatTable);
+        $this->db->where('x', $seat['x']);
+        $this->db->where('y', $seat['y']);
+        $data = $this->db->getOne($this->seatTable);
         if(count($data) > 0) {
-            $db->where('id', $data['id']);
+            $this->db->where('id', $data['id']);
             $status = $this->getNextSeatStatus($data['type']);
             if(!is_null($status)) {
-                $db->update($this->seatTable, array(
+                $this->db->update($this->seatTable, array(
                     'type' => $status
                 ));
             } else {
-                $db->where('id', $data['id']);
-                $db->delete($this->seatTable);
+                $this->db->where('id', $data['id']);
+                $this->db->delete($this->seatTable);
             }
             $newSeatplan = new Seatplan($data['event']);
             return json_encode(array( "plan" => $newSeatplan->draw()));
         } else {
-            $db->insert($this->seatTable, array(
+            $this->db->insert($this->seatTable, array(
                 'event' => $seat['event'],
                 'x' => $seat['x'],
                 'y' => $seat['y'],
@@ -268,13 +277,12 @@ class Seatplan {
     private function getNextSeatStatus($type) {
         $id = array_search($type, $this->seatStatus);
         $id++;
-        if(array_key_exists($id, $this->seatStatus)) {
+        if (array_key_exists($id, $this->seatStatus)) {
             return $this->seatStatus[$id];
         } else {
             return null;
         }
     }
-
 }
 
 ?>

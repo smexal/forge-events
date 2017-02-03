@@ -1,5 +1,15 @@
-<?php 
-class ForgeEventSignup extends AbstractView {
+<?php
+
+namespace Forge\Modules\ForgeEvents;
+
+use \Forge\Core\Abstracts\View;
+use \Forge\Core\App\App;
+use \Forge\Core\App\App\CollectionItem;
+use \Forge\Core\Classes\Fields;
+
+use function \Forge\Core\Classes\i;
+
+class ForgeEventSignup extends View {
     public $name = 'event-signup';
     public $allowNavigation = true;
     private $event = null;
