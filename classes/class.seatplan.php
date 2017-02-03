@@ -73,7 +73,7 @@ class Seatplan {
     }
 
     public function getSeatRows() {
-        $rowAmount = 30;
+        $rowAmount = 100;
         $rows = array();
         for($count = 1; $count <= $rowAmount; $count++) {
             $row = self::getRow($count);
@@ -86,7 +86,7 @@ class Seatplan {
 
     public function getRow($no) {
         $name = 'A';
-        $columnAmount = 30;
+        $columnAmount = 40;
         $columns = array();
         for($count = 1; $count <= $columnAmount; $count++) {
             $status = $this->getSeatStatus($name, $no);
