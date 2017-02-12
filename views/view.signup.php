@@ -4,6 +4,7 @@ namespace Forge\Modules\ForgeEvents;
 
 use \Forge\Core\Abstracts\View;
 use \Forge\Core\App\App;
+use \Forge\Core\App\App\CollectionItem;
 use \Forge\Core\Classes\Fields;
 
 
