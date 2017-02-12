@@ -8,9 +8,9 @@ use \Forge\Core\App\Auth;
 use \Forge\Core\Classes\User;
 use \Forge\Core\Classes\Utils;
 
-use function \Forge\Core\Classes\i;
 
-class ForgeEventCollection extends DataCollection {
+
+class EventCollection extends DataCollection {
     public $permission = "manage.collection.sites";
     private $itemId = null;
 

@@ -8,7 +8,7 @@ use \Forge\Core\App\API;
 use \Forge\Core\App\App;
 use \Forge\Core\App\Auth;
 
-use function \Forge\Core\Classes\i;
+
 
 class ForgeEvents extends Module {
     private $permission = 'manage.forge-events';
@@ -26,22 +26,16 @@ class ForgeEvents extends Module {
         Auth::registerPermissions("manage.forge-events.ticket-status.view");
         Auth::registerPermissions("manage.forge-events.ticket-status.edit");
 
-        // always load these files
-        Loader::instance()->loadDirectory(MOD_ROOT."forge-events/classes/");
-        Loader::instance()->loadDirectory(MOD_ROOT."forge-events/views/");
-
-        require_once($this->directory()."collection.event.php");
-
         // backend
         Loader::instance()->addStyle("modules/forge-events/assets/css/forge-events.less");
         Loader::instance()->addScript("modules/forge-events/assets/scripts/forge-events.js");
 
         // frontend
         App::instance()->tm->theme->addScript($this->url()."assets/scripts/forge-events.js", true);
-        App::instance()->tm->theme->addScript(CORE_WWW_ROOT."scripts/externals/tooltipster.bundle.min.js", true);
+        App::instance()->tm->theme->addScript(CORE_WWW_ROOT."ressources/scripts/externals/tooltipster.bundle.min.js", true);
 
         App::instance()->tm->theme->addStyle(MOD_ROOT."forge-events/assets/css/forge-events.less");
-        App::instance()->tm->theme->addStyle(CORE_WWW_ROOT."css/externals/tooltipster.bundle.min.css");
+        App::instance()->tm->theme->addStyle(CORE_WWW_ROOT."ressources/css/externals/tooltipster.bundle.min.css");
 
         API::instance()->register('forge-events', array($this, 'apiAdapter'));
     }

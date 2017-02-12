@@ -7,7 +7,7 @@ use \Forge\Core\Classes\User;
 
 use \Forge\Modules\ForgePayment\Payment;
 
-use function \Forge\Core\Classes\i;
+
 
 class SignupStepSeat {
     public $id = 'signup-seat';

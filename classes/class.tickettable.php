@@ -9,7 +9,7 @@ use \Forge\Core\Classes\Utils;
 
 use \Forge\Modules\ForgePayment\Payment;
 
-use function \Forge\Core\Classes\i;
+
 
 class TicketTable {
     private $event;
