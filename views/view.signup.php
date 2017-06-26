@@ -40,7 +40,4 @@ class SignupView extends View {
             'stepcontent' => $this->signup->getContents()
         ));
     }
-
-    private function getSteps() {
-    }
 }

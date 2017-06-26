@@ -2,11 +2,14 @@
 
 namespace Forge\Modules\ForgeEvents;
 
-use \Forge\Loader;
+use \Forge\Core\Classes\Fields;
+use \Forge\Core\Classes\Logger;
 use \Forge\Core\Abstracts\Module;
 use \Forge\Core\App\API;
 use \Forge\Core\App\App;
 use \Forge\Core\App\Auth;
+use \Forge\Core\Classes\Settings;
+use \Forge\Loader;
 
 
 
@@ -22,6 +25,10 @@ class ForgeEvents extends Module {
     }
 
     public function start() {
+        $this->install();
+        $this->registerSettings();
+
+
         Auth::registerPermissions($this->permission);
         Auth::registerPermissions("manage.forge-events.ticket-status.view");
         Auth::registerPermissions("manage.forge-events.ticket-status.edit");
@@ -32,7 +39,18 @@ class ForgeEvents extends Module {
 
         // frontend
         App::instance()->tm->theme->addScript($this->url()."assets/scripts/forge-events.js", true);
+
         App::instance()->tm->theme->addScript(CORE_WWW_ROOT."ressources/scripts/externals/tooltipster.bundle.min.js", true);
+
+        // google maps
+        // // https://maps.googleapis.com/maps/api/js?key=AIzaSyCUhl24DMsrw9U02Q3hR6LGYF_6oYoqEx0
+        $key = Settings::get('google_api_key');
+        if(! $key ) {
+            Logger::debug('No Google API Key defined for maps.');
+        } else {
+            App::instance()->tm->theme->addScript('//maps.googleapis.com/maps/api/js?key='.$key, true);
+            App::instance()->tm->theme->addScript($this->url()."assets/scripts/forge-events-map.js", true);
+        }
 
         App::instance()->tm->theme->addStyle(MOD_ROOT."forge-events/assets/css/forge-events.less");
         App::instance()->tm->theme->addStyle(CORE_WWW_ROOT."ressources/css/externals/tooltipster.bundle.min.css");
@@ -60,6 +78,46 @@ class ForgeEvents extends Module {
             default:
                 return false;
         }
+    }
+
+    private function registerSettings() {
+        $set = Settings::instance();
+        $set->registerField(
+            Fields::checkbox(array(
+            'key' => 'forge-events-seatplan',
+            'label' => i('Activate Seatplan Management', 'adb'),
+            'hint' => i('If this checkbox is set, the seatplan management will be activated.', 'adb')
+        ), Settings::get('forge-events-seatplan')), 'forge-events-seatplan', 'left', 'forge-events');
+    }
+
+    private function install() {
+        if(Settings::get($this->name . ".installed")) {
+            return;
+        }
+
+        App::instance()->db->rawQuery('CREATE TABLE IF NOT EXISTS `forge_events_seats` ('.
+          '`id` int(11) NOT NULL,'.
+          '`event` int(11) NOT NULL,'.
+          '`x` char(2) NOT NULL,'.
+          '`y` int(11) NOT NULL,'.
+          '`type` varchar(100) NOT NULL'.
+        ') ENGINE=InnoDB DEFAULT CHARSET=utf8;');
+
+        App::instance()->db->rawQuery('CREATE TABLE IF NOT EXISTS `forge_events_seat_reservations` ('.
+          '`id` int(11) NOT NULL,'.
+          '`user` int(11) NOT NULL,'.
+          '`x` varchar(10) NOT NULL,'.
+          '`y` int(11) NOT NULL,'.
+          '`order_id` int(11) NOT NULL,'.
+          '`event_id` int(11) NOT NULL'.
+        ') ENGINE=InnoDB DEFAULT CHARSET=utf8;');
+
+        App::instance()->db->rawQuery('ALTER TABLE `forge_events_seats` ADD PRIMARY KEY (`id`);');
+        App::instance()->db->rawQuery('ALTER TABLE `forge_events_seat_reservations` ADD PRIMARY KEY (`id`), ADD KEY `event_id` (`event_id`), ADD KEY `order_id` (`order_id`);');
+        App::instance()->db->rawQuery('ALTER TABLE `forge_events_seats` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1');
+        App::instance()->db->rawQuery('ALTER TABLE `forge_events_seat_reservations` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;');
+
+        Settings::set($this->name . ".installed", 1);
     }
 }
 

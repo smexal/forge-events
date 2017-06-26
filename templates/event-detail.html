@@ -1,0 +1,25 @@
+<div class="intro-infos">
+    <div class="wrapped">
+        <p class="alternative">{$start_date} – {$end_date}</p>
+        <h1>{$title}</h1>
+        <p class="lead">{$lead}</p>
+        <div class="text">
+        {$text}
+        </div>
+    </div>
+</div>
+{if="$signup"}
+<div class="signup">
+    <div class="wrapped">
+        <a href="{$signup_url}" class="btn btn-primary">{$signup_text}</a>
+    </div>
+</div>
+{/if}
+{if="$address"}
+<div class="map">
+    <div class="wrapped">
+        <div class="highlight">{$address}</div>
+        <div id="map_canvas" data-address="{$address}"></div>
+    </div>
+</div>
+{/if}

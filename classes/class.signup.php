@@ -2,12 +2,20 @@
 
 namespace Forge\Modules\ForgeEvents;
 
+use Forge\Core\App\App;
+use Forge\Core\Classes\Logger;
+
 class Signup {
     private $steps = array();
     private $event = false;
 
     public function __construct($event) {
         $this->event = $event;
+
+        if(! App::instance()->mm->isActive("forge-payment")) {
+            Logger::debug(i('You must have the forge-payment Plugin for this signup.', 'forge-events'));
+            return;
+        }
 
         $this->steps['user'] = new SignupStepUser();
         $this->steps['buy'] = new SignupStepBuy($this->event);

@@ -2,6 +2,7 @@
 
 namespace Forge\Modules\ForgeEvents;
 
+use Forge\Core\Classes\Settings;
 use \Forge\Core\Abstracts\DataCollection;
 use \Forge\Core\App\App;
 use \Forge\Core\App\Auth;
@@ -22,24 +23,36 @@ class EventCollection extends DataCollection {
         $this->preferences['single-item'] = i('Event', 'forge-events');
 
         $this->custom_fields();
-
     }
 
     public function render($item) {
+        return App::instance()->render(MOD_ROOT.'forge-events/templates/', 'event-detail', [
+            'title' => $item->getMeta('title'),
+            'lead' => $item->getMeta('description'),
+            'text' => $item->getMeta('text'),
+            'start_date' => $item->getMeta('start-date'),
+            'end_date' => $item->getMeta('end-date'),
+            'address' => $item->getMeta('address'),
+            'signup' => $item->getMeta('allow-signup'),
+            'signup_text' => i('Signup for this event', 'forge-events'),
+            'signup_url' => Utils::url(['event-signup', $item->id])
+        ]);
     }
 
     public function customEditContent($id) {
         $this->itemId = $id;
 
         $return = '';
-        $return.= $this->seatPlan();
+        if(Settings::get('forge-events-seatplan')) {
+            $return.= $this->seatPlan();
+        }
 
         return $return;
     }
 
     /*
     * Deprecated just for "demo" purposes...
-    * Adds a subnavigation for the collection */
+    * Adds a subnavigation for the collection
     public function getSubnavigation() {
         return [
             [
@@ -64,7 +77,7 @@ class EventCollection extends DataCollection {
             array('event' => $itemId)
         );
         return '<a class="ajax btn btn-xs" href="'.$url.'">'.i('an action', 'forge-events').'</a>';
-    }
+    }*/
 
     public function userTicketAvailable($id, $user) {
         $db = App::instance()->db;
@@ -93,62 +106,102 @@ class EventCollection extends DataCollection {
     }
 
     private function custom_fields() {
-        $this->addFields(array(
-            array(
-                'key' => 'amount-of-participants',
-                'label' => i('Number of participants', 'forge-events'),
-                'multilang' => true,
+        $this->addFields(
+            array_merge(
+                [
+                    array(
+                        'key' => 'amount-of-participants',
+                        'label' => i('Number of participants', 'forge-events'),
+                        'multilang' => true,
+                        'type' => 'number',
+                        'order' => 20,
+                        'position' => 'right',
+                        'hint' => ''
+                    ),
+                    array(
+                        'key' => 'allow-signup',
+                        'label' => i('Allow Event Signups', 'forge-events'),
+                        'multilang' => true,
+                        'type' => 'checkbox',
+                        'order' => 20,
+                        'position' => 'right',
+                        'hint' => ''
+                    ),
+                    array(
+                        'key' => 'start-date',
+                        'label' => i('Start Date', 'forge-events'),
+                        'multilang' => true,
+                        'type' => 'datetime',
+                        'order' => 25,
+                        'position' => 'right',
+                        'hint' => ''
+                    ),
+                    array(
+                        'key' => 'end-date',
+                        'label' => i('End Date', 'forge-events'),
+                        'multilang' => true,
+                        'type' => 'datetime',
+                        'order' => 30,
+                        'position' => 'right',
+                        'hint' => ''
+                    ),
+                    array(
+                        'key' => 'price',
+                        'label' => i('Event Price', 'forge-events'),
+                        'multilang' => true,
+                        'type' => 'number',
+                        'order' => 19,
+                        'position' => 'right',
+                        'hint' => ''
+                    ),
+                    array(
+                        'key' => 'address',
+                        'label' => i('Address', 'forge-events'),
+                        'multilang' => true,
+                        'type' => 'text',
+                        'order' => 18,
+                        'position' => 'right',
+                        'hint' => ''
+                    ),
+                    array(
+                        'key' => 'text',
+                        'label' => i('Text', 'forge-events'),
+                        'multilang' => true,
+                        'type' => 'wysiwyg',
+                        'order' => 10,
+                        'position' => 'left',
+                        'hint' => ''
+                    )
+                ],
+                $this->seatPlanRows()
+            )
+        );
+    }
+
+    private function seatPlanRows() {
+        if(! Settings::get('forge-events-seatplan'))
+            return [];
+
+        return [
+            [
+                'key' => 'seatplan_rows',
+                'label' => i('Amount of Rows on the Seatplan', 'forge-events'),
+                'multilang' => false,
                 'type' => 'number',
                 'order' => 20,
                 'position' => 'right',
                 'hint' => ''
-                ),
-            array(
-                'key' => 'allow-signup',
-                'label' => i('Allow Event Signups', 'forge-events'),
-                'multilang' => true,
-                'type' => 'checkbox',
-                'order' => 20,
-                'position' => 'right',
-                'hint' => ''
-                ),
-            array(
-                'key' => 'start-date',
-                'label' => i('Start Date', 'forge-events'),
-                'multilang' => true,
-                'type' => 'datetime',
-                'order' => 25,
-                'position' => 'right',
-                'hint' => ''
-                ),
-            array(
-                'key' => 'end-date',
-                'label' => i('End Date', 'forge-events'),
-                'multilang' => true,
-                'type' => 'datetime',
-                'order' => 30,
-                'position' => 'right',
-                'hint' => ''
-                ),
-            array(
-                'key' => 'price',
-                'label' => i('Event Price', 'forge-events'),
-                'multilang' => true,
+            ],
+            [
+                'key' => 'seatplan_columns',
+                'label' => i('Amount of Columns on the Seatplan', 'forge-events'),
+                'multilang' => false,
                 'type' => 'number',
-                'order' => 19,
+                'order' => 21,
                 'position' => 'right',
                 'hint' => ''
-                ),
-            array(
-                'key' => 'address',
-                'label' => i('Address', 'forge-events'),
-                'multilang' => true,
-                'type' => 'text',
-                'order' => 18,
-                'position' => 'right',
-                'hint' => ''
-                )
-            ));
+            ],
+        ];        
     }
 }
 

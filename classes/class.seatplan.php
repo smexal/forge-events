@@ -13,6 +13,7 @@ use \Forge\Modules\ForgePayment\Payment;
 
 class Seatplan {
     private $event = null;
+    private $collection = null;
     private $seatTable = 'forge_events_seats';
     private $seats = array();
     private $trim = false;
@@ -26,15 +27,16 @@ class Seatplan {
      );
     /**
      * Help the translation crawler...
-     * i('available');
-     * i('blocked');
-     * i('spacer');
-     * i('sold');
+     * i('available', 'core');
+     * i('blocked', 'core');
+     * i('spacer', 'core');
+     * i('sold', 'core');
      */
 
     public function __construct($id, $trim = false) {
         $this->event = $id;
         $this->trim = $trim;
+        $this->collection = App::instance()->cm->getCollection('forge-events')->getItem($this->event);
 
         $this->db = App::instance()->db;
         $this->db->where('event', $this->event);
@@ -84,7 +86,9 @@ class Seatplan {
     }
 
     public function getSeatRows() {
-        $rowAmount = 100;
+        $rowAmount = $this->collection->getMeta('seatplan_rows');
+        if(! $rowAmount)
+            $rowAmount = 20;
         $rows = array();
         for($count = 1; $count <= $rowAmount; $count++) {
             $row = self::getRow($count);
@@ -97,7 +101,10 @@ class Seatplan {
 
     public function getRow($no) {
         $name = 'A';
-        $columnAmount = 40;
+        $columnAmount = $this->collection->getMeta('seatplan_columns');
+        if(! $columnAmount )
+            $columnAmount = 30;
+
         $columns = array();
         for($count = 1; $count <= $columnAmount; $count++) {
             $status = $this->getSeatStatus($name, $no);
