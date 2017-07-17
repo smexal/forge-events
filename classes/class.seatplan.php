@@ -197,6 +197,13 @@ class Seatplan {
         }
     }
 
+    public function flushSeatReservation($x, $y, $event) {
+        $this->db->where('event_id', $event);
+        $this->db->where('x', $x);
+        $this->db->where('y', $y);
+        $this->db->delete('forge_events_seat_reservations');
+    }
+
     public function saveReservation($user, $x, $y, $order, $event) {
         // check if user already has a reservation, if yes. remove it.
         $this->db->where('user', $user);
@@ -263,6 +270,8 @@ class Seatplan {
                 $this->db->update($this->seatTable, array(
                     'type' => $status
                 ));
+                // remove existing reservations of a seat
+                $this->flushSeatReservation($seat['x'], $seat['y'], $seat['event']);
             } else {
                 $this->db->where('id', $data['id']);
                 $this->db->delete($this->seatTable);
