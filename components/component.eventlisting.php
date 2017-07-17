@@ -7,7 +7,7 @@ use Forge\Core\App\ModifyHandler;
 use Forge\Core\Components\ListingComponent;
 
 
-class EventlistingComponent extends ListingComponent { 
+class EventlistingComponent extends ListingComponent {
     protected $collection = 'forge-events';
     protected $order = 'created';
     protected $oderDirection = 'DESC';
@@ -39,14 +39,23 @@ class EventlistingComponent extends ListingComponent {
     }
 
     public function arraySort( $a, $b ) {
-        $cmpA = microtime($a->getMeta('start-date'));
-        $cmpB = microtime($b->getMeta('start-date'));
+        if(! $a->getMeta('start-date') || ! $b->getMeta('start-date')) {
+            return -1;
+        }
+        $tA = new \DateTime($a->getMeta('start-date'));
+        $tB = new \DateTime($b->getMeta('start-date'));
+        $cmpA = $tA->getTimestamp();
+        $cmpB = $tB->getTimestamp();
 
-        if( $cmpA == $cmpB ) { 
-            return 0 ;
-        } 
+        if(is_string($cmpA)) {
+            return -1;
+        }
+
+        if( $cmpA == $cmpB ) {
+            return 0;
+        }
         return ($cmpA < $cmpB) ? -1 : 1;
-    } 
+    }
 
     public function renderItem($item) {
         return App::instance()->render(MOD_ROOT.'forge-events/templates/', 'listing-item', array(
