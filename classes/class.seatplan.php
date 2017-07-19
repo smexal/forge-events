@@ -55,10 +55,21 @@ class Seatplan {
         ));
     }
 
-    private function getSeatAmount() {
+    public function getSeatAmount() {
         $amount = 0;
         foreach($this->seats as $seat) {
-            if($seat['type'] == 'available' || $seat['type'] == 'blocked') {
+            if($seat['type'] == 'available' || $seat['type'] == 'blocked' || $seat['type'] == 'sold') {
+                $amount++;
+            }
+        }
+        return $amount;
+    }
+
+    public function getSoldAmount() {
+        $amount = 0;
+        $countsAsSold = ['sold', 'blocked'];
+        foreach($this->seats as $seat) {
+            if(in_array($this->getSeatStatus($seat['x'], $seat['y']), $countsAsSold)) {
                 $amount++;
             }
         }

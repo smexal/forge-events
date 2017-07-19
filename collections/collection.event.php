@@ -100,6 +100,16 @@ class EventCollection extends DataCollection {
         return true;
     }
 
+    public function getEventMaximumAmount($eventId) {
+        $sp = new Seatplan($eventId);
+        return $sp->getSeatAmount();
+    }
+
+    public function getEventSoldAmount($eventId) {
+        $sp = new Seatplan($eventId);
+        return $sp->getSoldAmount();
+    }
+
     private function seatPlan() {
         $sp = new Seatplan($this->itemId);
         return $sp->draw();
@@ -201,7 +211,7 @@ class EventCollection extends DataCollection {
                 'position' => 'right',
                 'hint' => ''
             ],
-        ];        
+        ];
     }
 }
 

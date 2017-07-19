@@ -4,7 +4,7 @@ namespace Forge\Modules\ForgeEvents;
 
 use \Forge\Core\App\App;
 use \Forge\Core\Classes\Utils;
-use \Forge\Views\Login;
+use \Forge\Views\LoginView;
 
 
 
@@ -55,7 +55,7 @@ class SignupStepUser {
             'login' => array(
                 'title' => i('Login', 'forge-events'),
                 'intro' => i('You have to login with a verified user to buy a ticket.', 'forge-events'),
-                'form' => Login::instance()->form(false)
+                'form' => LoginView::instance()->form(false)
             ),
             'register' => array(
                 'title' => i('Registration', 'forge-events'),

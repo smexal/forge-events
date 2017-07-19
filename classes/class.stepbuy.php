@@ -219,7 +219,9 @@ class SignupStepBuy {
             return Payment::button(array(
                 "items" => $items,
                 "title" => $this->event->getMeta('title'),
-                "label" => $label
+                "label" => $label,
+                "success" => Utils::getUrl(['event-signup', $this->event->slug()]),
+                "cancel" => Utils::getUrl(['event-signup', $this->event->slug()])
             ));
         } else {
             return false;
