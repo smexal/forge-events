@@ -33,6 +33,11 @@ class SignupView extends View {
     public function content($parts = array()) {
         $collection = App::instance()->cm->getCollection('forge-events');
         $this->event = $collection->getBySlug($parts[0]);
+
+        if( $this->event->getMeta('allow-signup') == false || $this->event->getMeta('status') == 'draft') {
+            return;
+        }
+
         $this->signup = new Signup($this->event);
 
         if(count($parts) > 1 && $parts[1] == 'complete-order') {

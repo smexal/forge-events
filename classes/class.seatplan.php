@@ -123,11 +123,13 @@ class Seatplan {
                 if($status == 'spacer' || $status == 'undefined') {
                     $columns[$name] = array(
                         'status' => $status,
-                        'tipurl' => false
+                        'tipurl' => false,
+                        'mine' => false
                     );
                 } else {
                     $columns[$name] = array(
                         'status' => $status,
+                        'mine' => $this->isUserSeat($name, $count),
                         'tipurl' => Utils::getUrl(array(
                             "api",
                             "forge-events",
@@ -143,6 +145,23 @@ class Seatplan {
             $name++;
         }
         return $columns;
+    }
+
+    private function isUserSeat($x, $y) {
+        $ordersOfThisUser = Payment::getPayments(App::instance()->user->get('id'));
+        foreach($ordersOfThisUser as $order) {
+            foreach($order['meta']->items as $item) {
+                $this->db->where('user', $item->user);
+                $this->db->where('event_id', $this->event);
+                $seat = $this->db->getOne('forge_events_seat_reservations');
+                if(count($seat) > 0) {
+                    if($seat['x'] == $x && $seat['y'] == $y) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     private function getTooltip($name, $no, $status = false) {

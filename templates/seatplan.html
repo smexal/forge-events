@@ -24,7 +24,8 @@
         {loop="value"}
         <div 
             class="cell {$value.status} 
-            {if="$value.tipurl"}tipster-ajax{/if}" 
+            {if="$value.tipurl"}tipster-ajax{/if} 
+            {if="$value.mine"} mine{/if}"
             tip-url="{$value.tipurl}" 
             data-cell-id="{$key}">
         </div>
