@@ -1,4 +1,7 @@
 <div class="step-buy">
+    {if="$minimum_message"}
+        <p class="message">{$minimum_message}</p>
+    {/if}
     {$table}
     <div class="add-user">
         <h3>{$other_user_title}</h3>

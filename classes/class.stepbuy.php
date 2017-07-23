@@ -27,12 +27,34 @@ class SignupStepBuy {
     public function content() {
         return App::instance()->render(MOD_ROOT."forge-events/templates/steps/", "buy", array(
             'title' => i('Your Tickets', 'forge-events'),
+            'minimum_message' => $this->eventHasMinimum() ? $this->getMinimumText() : false,
             'table' => $this->getBuyTable(),
             'other_user_title' => i('Buy for another user'),
             'other_user_desc' => i('Buy a ticket for another user, by typing a valid user\'s E-Mail.'),
             'other_user_url' => Utils::getUrl(array('api', 'forge-events', 'ticket-buy', $this->event->id, 'another-user')),
             'add_user_form' => $this->getUserAddInput()
         ));
+    }
+
+    public function eventHasMinimum() {
+        $value = $this->event->getMeta('minimum_amount', 0);
+        if(is_numeric($value) && $value > 1) {
+            return true;
+        }
+        return;
+    }
+
+    public function getEventMinimum() {
+        $value = $this->event->getMeta('minimum_amount', 0);
+        if(is_numeric($value) && $value >= 1) {
+            return $value;
+        }
+        return 0;
+    }    
+
+    public function getMinimumText() {
+        $value = $this->event->getMeta('minimum_amount', 0);
+        return sprintf(i('The minimum ticket amount to buy is currently <strong>%1$s.</strong>', 'forge-events'), $value);
     }
 
     public function getBuyTable() {
@@ -146,9 +168,9 @@ class SignupStepBuy {
     private function getTicketStatus($userid) {
         $collection = $this->event->getCollection();
         if ($collection->userTicketAvailable($this->event->id, $userid)) {
-            return '<span class="special">'.i('Unpaid', 'forge-events').'</span>';
+            return '<span class="special">'.i('Available', 'forge-events').'</span>';
         } else {
-            return '<span class="special">'.i('Purchased', 'forge-events').'</span>';
+            return '<span class="discreet">'.i('Purchased', 'forge-events').'</span>';
         }
     }
 
@@ -169,8 +191,34 @@ class SignupStepBuy {
             }
         }
 
+        $orders = Payment::getPayments(App::instance()->user->get('id'));
+        foreach($orders as $order) {
+            foreach($order['meta']->items as $item) {
+                if($item->collection == $this->event->id) {
+                    if($item->user == App::instance()->user->get('id')) {
+                        continue;
+                    }
+                    $userid = User::exists($item->user);
+                    $user = new User($item->user);
+                    array_push($rows, $this->getTd($user));
+                }
+            }
+        }
 
         return $rows;
+    }
+
+    private function amountOfBuyedTickets() {
+        $buyed = 0;
+        $orders = Payment::getPayments(App::instance()->user->get('id'));
+        foreach($orders as $order) {
+            foreach($order['meta']->items as $item) {
+                if($item->collection == $this->event->id) {
+                    $buyed++;
+                }
+            }
+        }
+        return $buyed;
     }
 
     private function getTd($user) {
@@ -188,6 +236,9 @@ class SignupStepBuy {
         $ticketUser = false;
         if (is_array($users)) {
             // buy ticket for multiple users...
+            if(count($users) < $this->getEventMinimum() && $this->amountOfBuyedTickets() < $this->getEventMinimum()) {
+                return;
+            }
             foreach ($users as $user) {
                 if ($collection->userTicketAvailable($this->event->id, $user)) {
                     if (! is_array($ticketUser)) {
@@ -200,6 +251,9 @@ class SignupStepBuy {
                 $label = i('Buy all', 'forge-events');
             }
         } else {
+            if($this->getEventMinimum() > 1 && $this->amountOfBuyedTickets() < $this->getEventMinimum()) {
+                return;
+            }
             // buy only one ticket
             if ($collection->userTicketAvailable($this->event->id, $users)) {
                 $ticketUser = array($users);

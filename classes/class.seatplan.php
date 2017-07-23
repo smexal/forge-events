@@ -241,6 +241,10 @@ class Seatplan {
     public function toggleSeat($seat) {
 
         // reservation
+        if($seat['reservation'] == 'none') {
+            $this->trim = true;
+            return json_encode(array( "plan" => $this->draw()));
+        }
         if($seat['reservation']) {
             if($this->getSeatStatus($seat['x'], $seat['y']) != 'available') {
                 $this->trim = true;
