@@ -16,7 +16,7 @@ var forgeEvents = {
                         plan.addClass("loading");
                         var seat = $(this).data('cell-id');
                         var seatReservation = $("input[name='forge-events-user-to-set']");
-                        var reservationRequest = '';
+                        var reservationRequest = 'none';
                         seatReservation.each(function() {
                             if($(this).is(':checked')) {
                                 reservationRequest = $(this).data('user-id');

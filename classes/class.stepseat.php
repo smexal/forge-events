@@ -4,6 +4,7 @@ namespace Forge\Modules\ForgeEvents;
 
 use \Forge\Core\App\App;
 use \Forge\Core\Classes\User;
+use \Forge\Core\Classes\Utils;
 
 use \Forge\Modules\ForgePayment\Payment;
 
@@ -25,7 +26,12 @@ class SignupStepSeat {
                 'buyed_seats' => $this->getBuyedSeats(),
                 'seatplan_title' => i('Seatplan'),
                 'seatplan_description' => i('Make sure, you have checked the correct user in the list above, then click on an available seat to set your reservation.'),
-                'seatplan' => $this->seatplan()
+                'seatplan' => $this->seatplan(),
+                'completeReservation' => [
+                    'text' => i('Complete reservation', 'forge-events'),
+                    'link' => Utils::url(['event-signup', $this->event->slug(), 'complete-order'])
+                ],
+                'locked_text' => i('seat is locked', 'forge-events')
             ));
         } else {
             return '';
@@ -41,12 +47,41 @@ class SignupStepSeat {
                     $user = new User($item->user);
                     array_push($buyed_seats, array(
                         "user" => $user->get('username') .' <small>'. $this->getUserSeat($user->get('id')).'</small>',
-                        "id" => $item->user
+                        "id" => $item->user,
+                        "seatSet" => $this->getUserSeat($user->get('id')) ? true : false,
+                        'seatId' => $this->getUserSeatId($user->get('id')),
+                        'locked' => $this->seatLocked($user->get('id'))
                     ));
                 }
             }
         }
         return $buyed_seats;
+    }
+
+    public function seatLocked($user) {
+        $db = App::instance()->db;
+        if(is_object($this->event)) {
+            $id = $this->event->id;
+        } else {
+            $id = $this->event;
+        }
+        $db->where('event_id', $id);
+        $db->where('user', $user);
+        $seat = $db->getOne('forge_events_seat_reservations');
+        return $seat['locked'];
+    }
+
+    public function getUserSeatId($user) {
+        $db = App::instance()->db;
+        if(is_object($this->event)) {
+            $id = $this->event->id;
+        } else {
+            $id = $this->event;
+        }
+        $db->where('event_id', $id);
+        $db->where('user', $user);
+        $seat = $db->getOne('forge_events_seat_reservations');
+        return $seat['id'];
     }
 
     public function getUserSeat($user) {

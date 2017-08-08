@@ -100,6 +100,16 @@ class EventCollection extends DataCollection {
         return true;
     }
 
+    public function getEventMaximumAmount($eventId) {
+        $sp = new Seatplan($eventId);
+        return $sp->getSeatAmount();
+    }
+
+    public function getEventSoldAmount($eventId) {
+        $sp = new Seatplan($eventId);
+        return $sp->getSoldAmount();
+    }
+
     private function seatPlan() {
         $sp = new Seatplan($this->itemId);
         return $sp->draw();
@@ -171,6 +181,15 @@ class EventCollection extends DataCollection {
                         'order' => 10,
                         'position' => 'left',
                         'hint' => ''
+                    ),
+                    array(
+                        'key' => 'minimum_amount',
+                        'label' => i('Minimum Amount of Tickets per Buy', 'forge-events'),
+                        'multilang' => false,
+                        'type' => 'number',
+                        'order' => 20,
+                        'position' => 'right',
+                        'hint' => ''
                     )
                 ],
                 $this->seatPlanRows()
@@ -201,7 +220,7 @@ class EventCollection extends DataCollection {
                 'position' => 'right',
                 'hint' => ''
             ],
-        ];        
+        ];
     }
 }
 
