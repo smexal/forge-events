@@ -2,12 +2,14 @@
 
 namespace Forge\Modules\ForgeEvents;
 
-use \Forge\Core\Classes\Fields;
-use \Forge\Core\Classes\Logger;
+use \Forge\Core\Classes\Utils;
 use \Forge\Core\Abstracts\Module;
 use \Forge\Core\App\API;
 use \Forge\Core\App\App;
 use \Forge\Core\App\Auth;
+use \Forge\Core\App\ModifyHandler;
+use \Forge\Core\Classes\Fields;
+use \Forge\Core\Classes\Logger;
 use \Forge\Core\Classes\Settings;
 use \Forge\Loader;
 
@@ -27,6 +29,18 @@ class ForgeEvents extends Module {
     public function start() {
         $this->install();
         $this->registerSettings();
+
+
+        if(App::instance()->mm->isActive('forge-payment')) {
+            ModifyHandler::instance()->add(
+                'modify_order_table_th', 
+                [$this, 'orderTableHeading']
+            );
+            ModifyHandler::instance()->add(
+                'modify_order_table_td', 
+                [$this, 'orderTableRow']
+            );
+        }
 
 
         Auth::registerPermissions($this->permission);
@@ -56,6 +70,24 @@ class ForgeEvents extends Module {
         App::instance()->tm->theme->addStyle(CORE_WWW_ROOT."ressources/css/externals/tooltipster.bundle.min.css");
 
         API::instance()->register('forge-events', array($this, 'apiAdapter'));
+    }
+
+    public function orderTableHeading($ths) {
+        $ths[] = [
+            'id' => 'ticket',
+            'content' => i('Ticket', 'forge-events'),
+            'class' => ''
+        ];
+        return $ths;
+    }
+
+    public function orderTableRow($td, $args) {
+        $td[] = [
+            'id' => 'ticket',
+            'content' => '<a target="blank" href="'.Utils::getUrl(['fe-ticket-print', $args['order']]).'">'.i('Print Ticket', 'forge-event').'</a>',
+            'class' => ''
+        ];
+        return $td;
     }
 
     public function apiAdapter($data) {

@@ -17,11 +17,16 @@ var forgeEvents = {
                         var seat = $(this).data('cell-id');
                         var seatReservation = $("input[name='forge-events-user-to-set']");
                         var reservationRequest = 'none';
+                        var isAdmin = true;
                         seatReservation.each(function() {
+                            isAdmin = false;
                             if($(this).is(':checked')) {
                                 reservationRequest = $(this).data('user-id');
                             }
                         });
+                        if(isAdmin) {
+                            reservationRequest = 'admin';
+                        }
 
                         $.ajax({
                             method: "POST",

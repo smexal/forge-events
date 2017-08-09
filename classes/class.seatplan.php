@@ -76,6 +76,22 @@ class Seatplan {
         return $amount;
     }
 
+    public function getUserSeat($user) {
+        $db = App::instance()->db;
+        if(is_object($this->event)) {
+            $id = $this->event->id;
+        } else {
+            $id = $this->event;
+        }
+        $db->where('event_id', $id);
+        $db->where('user', $user);
+        $seat = $db->get('forge_events_seat_reservations');
+        if(count($seat) > 0) {
+            return $seat[0]['x'].':'.$seat[0]['y'];
+        }
+        return '';
+    }
+
     private function getAllStatus() {
         $stats = array();
         foreach($this->seatStatus as $stat) {
@@ -264,7 +280,7 @@ class Seatplan {
             $this->trim = true;
             return json_encode(array( "plan" => $this->draw()));
         }
-        if($seat['reservation']) {
+        if($seat['reservation'] && $seat['reservation'] != 'admin') {
             if($this->getSeatStatus($seat['x'], $seat['y']) != 'available') {
                 $this->trim = true;
                 return json_encode(array( "plan" => $this->draw()));
@@ -287,7 +303,7 @@ class Seatplan {
                 }
             }
         }
-        if(! Auth::allowed('manage.forge-events', false) || $seat['reservation']) {
+        if(! Auth::allowed('manage.forge-events', false) || $seat['reservation'] != 'admin') {
             $newSeatplan = new Seatplan($seat['event'], true);
             return json_encode(array( "plan" => $newSeatplan->draw()));
         }
