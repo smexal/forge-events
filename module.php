@@ -120,6 +120,20 @@ class ForgeEvents extends Module {
             'label' => i('Activate Seatplan Management', 'adb'),
             'hint' => i('If this checkbox is set, the seatplan management will be activated.', 'adb')
         ), Settings::get('forge-events-seatplan')), 'forge-events-seatplan', 'left', 'forge-events');
+
+        $set->registerField(
+            Fields::text(array(
+            'key' => 'forge-events-ticket-text-below-facts',
+            'label' => i('Text below Facts', 'forge-events'),
+            'hint' => i('Text below the facts in the pdf-ticket.', 'forge-events')
+        ), Settings::get('forge-events-ticket-text-below-facts')), 'forge-events-ticket-text-below-facts', 'left', 'forge-events');
+
+        $set->registerField(
+            Fields::text(array(
+            'key' => 'forge-events-ticket-footer-text',
+            'label' => i('Footer Ticket Text', 'forge-events'),
+            'hint' => i('Footer Text for the pdf ticket.', 'forge-events')
+        ), Settings::get('forge-events-ticket-footer-text')), 'forge-events-ticket-footer-text', 'left', 'forge-events');
     }
 
     private function install() {
@@ -141,7 +155,8 @@ class ForgeEvents extends Module {
           '`x` varchar(10) NOT NULL,'.
           '`y` int(11) NOT NULL,'.
           '`order_id` int(11) NOT NULL,'.
-          '`event_id` int(11) NOT NULL'.
+          '`event_id` int(11) NOT NULL,'.
+          '`locked` int(11) NOT NULL DEFAULT \'0\''.
         ') ENGINE=InnoDB DEFAULT CHARSET=utf8;');
 
         App::instance()->db->rawQuery('ALTER TABLE `forge_events_seats` ADD PRIMARY KEY (`id`);');

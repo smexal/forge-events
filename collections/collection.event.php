@@ -50,34 +50,27 @@ class EventCollection extends DataCollection {
         return $return;
     }
 
-    /*
-    * Deprecated just for "demo" purposes...
-    * Adds a subnavigation for the collection
     public function getSubnavigation() {
         return [
             [
-            'url' => 'tickets',
-            'title' => i('Subnavigation')
+            'url' => 'participants',
+            'title' => i('Participants', 'forge-events')
             ]
         ];
 
     }
 
-    public function subviewTickets($itemId) {
-        if(! Auth::allowed("manage.forge-events.ticket-status.view")) {
+    public function subviewParticipants($itemId) {
+        if(! Auth::allowed("manage.forge-events")) {
             return;
         }
-        return "hello subview";
+        $participants = new Participants();
+        return $participants->renderTable();
     }
 
-    public function subviewTicketsActions($itemId) {
-        $url = Utils::getUrl(
-            ['api', 'forge-events-tickets', 'clear-drafts'],
-            true,
-            array('event' => $itemId)
-        );
-        return '<a class="ajax btn btn-xs" href="'.$url.'">'.i('an action', 'forge-events').'</a>';
-    }*/
+    public function subviewParticipantsActions($itemId) {
+        return '';
+    }
 
     public function userTicketAvailable($id, $user) {
         $db = App::instance()->db;
