@@ -57,15 +57,14 @@ class TicketprintView extends View {
         $this->pdf->file->AddPage();
         $this->pdf->file->SetTextColor(10, 10, 10);
 
-        $logo = new Media(Settings::get('forge-pdf-logo'));
-
         $offsetLeft = 20;
         $outerRight = 170;
-
         $offsetY = 80;
 
+        $logo = new Media(Settings::get('forge-pdf-logo'));
+
         $this->pdf->file->SetX(0);
-        $this->pdf->file->Image('.'.$logo->getUrl(), $offsetLeft, 20, 30, 0, 'PNG');
+        $this->pdf->file->Image($logo->getAbsolutePath(), $offsetLeft, 20, 30, 0, 'PNG');
         $this->pdf->file->SetFont('Arial','B',16);
         $this->pdf->file->SetXY($offsetLeft, $offsetY);
         $this->pdf->file->Cell(
@@ -76,8 +75,8 @@ class TicketprintView extends View {
         );
 
         /* QR */
-        $checkInUrl = Utils::getHomeUrl(true).Utils::getUrl(['fe-checkin', Utils::hash($order->data['id'])]);
-        $image = Utils::getHomeUrl(true).Utils::getUrl(['fe-qr'], true, ['text' => $checkInUrl]);
+        $checkInUrl = Utils::getUrl(['fe-checkin', Utils::hash($order->data['id'])], false, [], false, true);
+        $image = Utils::getUrl(['fe-qr'], true, ['text' => $checkInUrl], false, true);
         $this->pdf->file->Image($image, 140, 35, 40, 0, 'PNG');
 
         $this->pdf->file->SetFont('Arial','',10);

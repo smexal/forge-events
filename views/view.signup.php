@@ -70,7 +70,7 @@ class SignupView extends View {
             $data = ['locked' => 1];
             $db->update('forge_events_seat_reservations', $data);
         }
-        App::instance()->addMessage(i('Registration complete, we\'re looking forward to meet you at the event.', 'success'));
+        App::instance()->addMessage(i('Registration complete, we\'re looking forward to meet you at the event.', 'forge-events'), 'success');
         // redirect to orders...
         App::instance()->redirect(Utils::url(['orders']));
     }

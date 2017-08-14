@@ -84,7 +84,7 @@ class ForgeEvents extends Module {
     public function orderTableRow($td, $args) {
         $td[] = [
             'id' => 'ticket',
-            'content' => '<a target="blank" href="'.Utils::getUrl(['fe-ticket-print', $args['order']]).'">'.i('Print Ticket', 'forge-event').'</a>',
+            'content' => '<a target="blank" href="'.Utils::getUrl(['fe-ticket-print', $args['order']]).'">'.i('Print Ticket', 'forge-events').'</a>',
             'class' => ''
         ];
         return $td;

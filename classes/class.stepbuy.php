@@ -29,8 +29,8 @@ class SignupStepBuy {
             'title' => i('Your Tickets', 'forge-events'),
             'minimum_message' => $this->eventHasMinimum() ? $this->getMinimumText() : false,
             'table' => $this->getBuyTable(),
-            'other_user_title' => i('Buy for another user'),
-            'other_user_desc' => i('Buy a ticket for another user, by typing a valid user\'s E-Mail.'),
+            'other_user_title' => i('Buy for another user', 'forge-events'),
+            'other_user_desc' => i('Buy a ticket for another user, by typing a valid user`s E-Mail.', 'forge-events'),
             'other_user_url' => Utils::getUrl(array('api', 'forge-events', 'ticket-buy', $this->event->id, 'another-user')),
             'add_user_form' => $this->getUserAddInput()
         ));
@@ -225,7 +225,7 @@ class SignupStepBuy {
         return array(
             $this->getTicketStatus($user->get('id')),
             $user->get('username').' ('.$user->get('email').')',
-            'default',
+            i('default', 'forge-events'),
             Utils::formatAmount($this->event->getMeta('price')),
             $this->getAction($user->get('id'))
         );
