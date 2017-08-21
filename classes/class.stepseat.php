@@ -5,6 +5,7 @@ namespace Forge\Modules\ForgeEvents;
 use \Forge\Core\App\App;
 use \Forge\Core\Classes\User;
 use \Forge\Core\Classes\Utils;
+use \Forge\Core\Classes\Settings;
 
 use \Forge\Modules\ForgePayment\Payment;
 
@@ -44,6 +45,8 @@ class SignupStepSeat {
         foreach($orders as $order) {
             foreach($order['meta']->items as $item) {
                 if($item->collection == $this->event->id) {
+                    if(! User::exists($item->user)) 
+                        continue;
                     $user = new User($item->user);
                     array_push($buyed_seats, array(
                         "user" => $user->get('username') .' <small>'. $this->getUserSeat($user->get('id')).'</small>',
@@ -59,6 +62,9 @@ class SignupStepSeat {
     }
 
     public function seatLocked($user) {
+        if(! Settings::get('forge-events-seatplan-locked')) {
+            return false;
+        }
         $db = App::instance()->db;
         if(is_object($this->event)) {
             $id = $this->event->id;

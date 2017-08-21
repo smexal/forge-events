@@ -47,6 +47,20 @@ class ForgeEvents extends Module {
         Auth::registerPermissions("manage.forge-events.ticket-status.view");
         Auth::registerPermissions("manage.forge-events.ticket-status.edit");
 
+        if(Settings::get('forge-events-seatplan')) {
+            ModifyHandler::instance()->add(
+                'core_delete_user',
+                function($user) {
+                    // delete user seat reservations, when user gets deleted.
+                    if(is_numeric($user)) {
+                        $db = App::instance()->db;
+                        $db->where('user', $user);
+                        $db->delete('forge_events_seat_reservations');
+                    }
+                }
+            );
+        }
+
         // backend
         Loader::instance()->addStyle("modules/forge-events/assets/css/forge-events.less");
         Loader::instance()->addScript("modules/forge-events/assets/scripts/forge-events.js");
@@ -117,9 +131,16 @@ class ForgeEvents extends Module {
         $set->registerField(
             Fields::checkbox(array(
             'key' => 'forge-events-seatplan',
-            'label' => i('Activate Seatplan Management', 'adb'),
-            'hint' => i('If this checkbox is set, the seatplan management will be activated.', 'adb')
+            'label' => i('Activate Seatplan Management', 'forge-events'),
+            'hint' => i('If this checkbox is set, the seatplan management will be activated.', 'forge-events')
         ), Settings::get('forge-events-seatplan')), 'forge-events-seatplan', 'left', 'forge-events');
+
+        $set->registerField(
+            Fields::checkbox(array(
+            'key' => 'forge-events-seatplan-locked',
+            'label' => i('Ticket seat locked after finished signup.', 'forge-events'),
+            'hint' => i('If this checkbox is set, the user won\'t be able to change its seat after completing the reservation.', 'forge-events')
+        ), Settings::get('forge-events-seatplan-locked')), 'forge-events-seatplan-locked', 'left', 'forge-events');
 
         $set->registerField(
             Fields::text(array(

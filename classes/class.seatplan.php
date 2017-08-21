@@ -46,13 +46,17 @@ class Seatplan {
     public function draw() {
         return App::instance()->render(MOD_ROOT."forge-events/templates/", "seatplan", array(
             'trim' => $this->trim,
-            'amount' => sprintf(i('Amount of Seats: %s'), $this->getSeatAmount()),
+            'amount' => sprintf(i('Available: %s', 'forge-events'), $this->getSeatDisplay()),
             'status_list' => $this->getAllStatus(),
             'event_id' => $this->event,
             'api_url' => Utils::getUrl(array("api", "forge-events", "seatplan", "toggle-seat")),
             'column_names' => $this->getRow(1),
             'rows' => $this->getSeatRows()
         ));
+    }
+
+    public function getSeatDisplay() {
+        return ($this->getSeatAmount() - $this->getSoldAmount()).' ( '.i('Total: ', 'forge-events').' '.$this->getSeatAmount().' )';
     }
 
     public function getSeatAmount() {

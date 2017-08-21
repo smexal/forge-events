@@ -33,6 +33,10 @@ class TicketprintView extends View {
             echo 'false';
             exit();
         }
+        if($order->data['status'] !== 'success') {
+            echo 'nope';
+            exit();
+        }
 
         if(! App::instance()->mm->isActive('forge-fpdf')) {
             echo 'no fpdf mobule';
@@ -70,7 +74,7 @@ class TicketprintView extends View {
         $this->pdf->file->Cell(
             160, 
             10,
-            i(sprintf('Ticket for %s', $titleCollection->getMeta('title')), 'forge-events'),
+            utf8_decode(sprintf(i('Ticket for %s', 'forge-events'), $titleCollection->getMeta('title'))),
             0
         );
 
@@ -82,10 +86,10 @@ class TicketprintView extends View {
         $this->pdf->file->SetFont('Arial','',10);
         $offsetY+=10;
         $this->pdf->file->SetXY($offsetLeft, $offsetY);
-        $this->pdf->file->Cell($outerRight, 6, $titleCollection->getMeta('start-date').' - '.$titleCollection->getMeta('end-date'), 0);
+        $this->pdf->file->Cell($outerRight, 6, utf8_decode($titleCollection->getMeta('start-date').' - '.$titleCollection->getMeta('end-date')), 0);
         $offsetY+=5;
         $this->pdf->file->SetXY($offsetLeft, $offsetY);
-        $this->pdf->file->Cell($outerRight, 6, $titleCollection->getMeta('address'), 0);
+        $this->pdf->file->Cell($outerRight, 6, utf8_decode($titleCollection->getMeta('address')), 0);
 
         $this->pdf->file->SetFont('Arial','',12);
         $this->pdf->file->SetDrawColor(230,230,230);
@@ -100,35 +104,35 @@ class TicketprintView extends View {
         $offsetY+= 4;
         $this->pdf->file->SetFont('Arial','', $this->fontSizeLabel);
         $this->pdf->file->SetXY($offsetLeft, $offsetY);
-        $this->pdf->file->Cell(50, 6, i('User', 'forge-events'), 0);
+        $this->pdf->file->Cell(50, 6, utf8_decode(i('User', 'forge-events')), 0);
         
         $offsetY+= 5;
         $this->pdf->file->SetFont('Arial','', $this->fontSizeValue);
         $this->pdf->file->SetXY($offsetLeft, $offsetY);
-        $this->pdf->file->Cell(50, 6, $user->get('username').' ('.$user->get('email').')', 0);
+        $this->pdf->file->Cell(50, 6, utf8_decode($user->get('username')).' ('.utf8_decode($user->get('email')).')', 0);
 
         $offsetY+= 10;
         $this->pdf->file->SetFont('Arial','', $this->fontSizeLabel);
         $this->pdf->file->SetXY($offsetLeft, $offsetY);
-        $this->pdf->file->Cell(50, 6, i('Seat', 'forge-events'), 0);
+        $this->pdf->file->Cell(50, 6, utf8_decode(i('Seat', 'forge-events')), 0);
 
         $offsetY+= 5;
         $this->pdf->file->SetFont('Arial','', $this->fontSizeValue);
         $this->pdf->file->SetXY($offsetLeft, $offsetY);
-        $this->pdf->file->Cell(50, 6, $seatplan->getUserSeat($user->get('id')), 0);
+        $this->pdf->file->Cell(50, 6, utf8_decode($seatplan->getUserSeat($user->get('id'))), 0);
 
 
         $offsetY+= 10;
         $this->pdf->file->SetFont('Arial','', $this->fontSizeLabel);
         $this->pdf->file->SetXY($offsetLeft, $offsetY);
-        $this->pdf->file->Cell(50, 6, i('Order date / Booking ID', 'forge-events'), 0);
+        $this->pdf->file->Cell(50, 6, utf8_decode(i('Order date / Booking ID', 'forge-events')), 0);
 
 
         $offsetY+= 5;
         $this->pdf->file->SetFont('Arial','', $this->fontSizeValue);
         $this->pdf->file->SetXY($offsetLeft, $offsetY);
         $text = Utils::dateFormat($order->data['order_date'], true).' / '.$order->data['id'];
-        $this->pdf->file->Cell(50, 6, $text, 0);
+        $this->pdf->file->Cell(50, 6, utf8_decode($text), 0);
 
         $offsetY+= 3;
         $this->pdf->file->Line($offsetLeft, $offsetY+8, $outerRight, $offsetY+8);
@@ -136,12 +140,12 @@ class TicketprintView extends View {
         $offsetY+= 10;
         $this->pdf->file->SetFont('Arial','', $this->fontSizeLabel);
         $this->pdf->file->SetXY($offsetLeft, $offsetY);
-        $this->pdf->file->Cell(50, 6, Settings::get('forge-events-ticket-text-below-facts'), 0);
+        $this->pdf->file->Cell(50, 6, utf8_decode(Settings::get('forge-events-ticket-text-below-facts')), 0);
         
         $this->pdf->file->SetTextColor(160, 160, 160);
         $this->pdf->file->SetFont('Arial','B', 7);
         $this->pdf->file->SetXY($offsetLeft, 270);
-        $this->pdf->file->Cell(170, 6, Settings::get('forge-events-ticket-footer-text'), 0, 1, 'C');
+        $this->pdf->file->Cell(170, 6, utf8_decode(Settings::get('forge-events-ticket-footer-text')), 0, 1, 'C');
         
     }
 }
