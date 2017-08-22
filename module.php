@@ -106,6 +106,9 @@ class ForgeEvents extends Module {
 
     public function apiAdapter($data) {
         switch ($data['query'][0]) {
+            case 'participants':
+                $participants = new Participants($data['query'][1]);
+                return $participants->handleQuery($data['query'][2]);
             case 'seatplan':
                 if (array_key_exists('event', $data['data'])) {
                     $sp = new Seatplan($data['data']['event']);

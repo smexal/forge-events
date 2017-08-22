@@ -6,6 +6,7 @@ use \Forge\Core\App\App;
 use \Forge\Core\App\Auth;
 use \Forge\Core\Classes\User;
 use \Forge\Core\Classes\Utils;
+use \Forge\Core\Classes\Logger;
 
 use \Forge\Modules\ForgePayment\Payment;
 
@@ -290,12 +291,12 @@ class Seatplan {
                 return json_encode(array( "plan" => $this->draw()));
             }
 
+            $saved = false;
             $ordersOfThisUser = Payment::getPayments(App::instance()->user->get('id'));
             foreach($ordersOfThisUser as $order) {
                 foreach($order['meta']->items as $item) {
-                    if($item->user == $seat['reservation']
-                    && $item->collection == $seat['event']) {
-
+                    if( $item->user == $seat['reservation'] && $item->collection == $seat['event']) {
+                        $saved = true;
                         $this->saveReservation(
                             $seat['reservation'],
                             $seat['x'],
@@ -305,6 +306,21 @@ class Seatplan {
                         );
                     }
                 }
+            }
+            // is own reservation
+            $collection = App::instance()->cm->getCollection('forge-events');
+            if($seat['reservation'] == App::instance()->user->get('id')
+                && ! $collection->userTicketAvailable($seat['event'], $seat['reservation'])
+                && ! $saved) {
+
+                $order = $collection->getTicketOrder($seat['event'], $seat['reservation']);
+                $this->saveReservation(
+                    $seat['reservation'],
+                    $seat['x'],
+                    $seat['y'],
+                    $order,
+                    $seat['event']
+                );
             }
         }
         if(! Auth::allowed('manage.forge-events', false) || $seat['reservation'] != 'admin') {

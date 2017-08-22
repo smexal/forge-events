@@ -58,6 +58,27 @@ class SignupStepSeat {
                 }
             }
         }
+        // check for own seat, buyed from someone else...
+        $buyedSelf = false;
+        foreach($buyed_seats as $s) {
+            if($s['id'] == App::instance()->user->get('id')) {
+                $buyedSelf = true;
+                break;
+            }
+        }
+        if(! $buyedSelf) {
+            $collection = $this->event->getCollection();
+            $user = App::instance()->user;
+            if (! $collection->userTicketAvailable($this->event->id, $user->get('id'))) {
+                $buyed_seats[] = [
+                    "user" => $user->get('username') .' <small>'. $this->getUserSeat($user->get('id')).'</small>',
+                    "id" => $user->get('id'),
+                    "seatSet" => $this->getUserSeat($user->get('id')) ? true : false,
+                    'seatId' => $this->getUserSeatId($user->get('id')),
+                    'locked' => $this->seatLocked($user->get('id'))
+                ];
+            }
+        }
         return $buyed_seats;
     }
 

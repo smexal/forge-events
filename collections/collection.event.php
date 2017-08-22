@@ -64,7 +64,12 @@ class EventCollection extends DataCollection {
         if(! Auth::allowed("manage.forge-events")) {
             return;
         }
-        $participants = new Participants();
+
+        $participants = new Participants($itemId);
+
+        if(array_key_exists('deleteSeat', $_GET) && is_numeric($_GET['deleteSeat'])) {
+            $participants->delete($_GET['deleteSeat']);
+        }
         return $participants->renderTable();
     }
 
@@ -91,6 +96,34 @@ class EventCollection extends DataCollection {
             }
         }
         return true;
+    }
+
+    public function getTicketBuyer($id, $user) {
+        $db = App::instance()->db;
+        $db->where("status", "success");
+        $orders = $db->get("forge_payment_orders");
+        foreach ($orders as $order) {
+            $orderMeta = json_decode(urldecode($order['meta']));
+            foreach ($orderMeta->{'items'} as $itemInOrder) {
+                if ($itemInOrder->user == $user && $itemInOrder->collection == $id) {
+                    return new User($order['user']);
+                }
+            }
+        }
+    }
+
+    public function getTicketOrder($id, $user) {
+        $db = App::instance()->db;
+        $db->where("status", "success");
+        $orders = $db->get("forge_payment_orders");
+        foreach ($orders as $order) {
+            $orderMeta = json_decode(urldecode($order['meta']));
+            foreach ($orderMeta->{'items'} as $itemInOrder) {
+                if ($itemInOrder->user == $user && $itemInOrder->collection == $id) {
+                    return $order['user'];
+                }
+            }
+        }
     }
 
     public function getEventMaximumAmount($eventId) {

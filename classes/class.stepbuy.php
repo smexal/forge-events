@@ -170,7 +170,12 @@ class SignupStepBuy {
         if ($collection->userTicketAvailable($this->event->id, $userid)) {
             return '<span class="special">'.i('Available', 'forge-events').'</span>';
         } else {
-            return '<span class="discreet">'.i('Purchased', 'forge-events').'</span>';
+            $buyer = $collection->getTicketBuyer($this->event->id, $userid);
+            if(App::instance()->user->get('id') == $buyer->get('id')) {
+                return '<span class="discreet">'.i('Purchased', 'forge-events').'</span>';
+            } else {
+                return '<span class="discreet">'.sprintf(i('Purchased (by %1$s)', 'forge-events'), $buyer->get('username')).'</span>';
+            }
         }
     }
 
@@ -182,12 +187,14 @@ class SignupStepBuy {
 
         // add current user
         array_push($rows, $this->getTd(App::instance()->user));
+        $users = [];
 
         if (array_key_exists('savedUsers', $_SESSION) && is_array($_SESSION['savedUsers'])) {
             foreach ($_SESSION['savedUsers'] as $otherUser) {
                 $userid = User::exists($otherUser);
                 $user = new User($userid);
                 array_push($rows, $this->getTd($user));
+                $users[] = $userid;
             }
         }
 
@@ -198,9 +205,13 @@ class SignupStepBuy {
                     if($item->user == App::instance()->user->get('id')) {
                         continue;
                     }
+                    if(in_array($item->user, $users)) {
+                        continue;
+                    }
                     $userid = User::exists($item->user);
                     $user = new User($item->user);
                     array_push($rows, $this->getTd($user));
+                    $users[] = $userid;
                 }
             }
         }
