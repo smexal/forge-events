@@ -67,13 +67,13 @@ class Participants {
             $user = new User($part['user']);
             if($this->searchTerm) {
                 $found = false;
-                if(strstr($user->get('username'), $this->searchTerm)) {
+                if(strstr(strtolower($user->get('username')), strtolower($this->searchTerm))) {
                     $found = true;
                 }
-                if(strstr($user->get('email'), $this->searchTerm)) {
+                if(strstr(strtolower($user->get('email')), strtolower($this->searchTerm))) {
                     $found = true;
                 }
-                if(strstr($part['x'].':'.$part['y'], $this->searchTerm)) {
+                if(strstr(strtolower($part['x'].':'.$part['y']), strtolower($this->searchTerm))) {
                     $found = true;
                 }
                 if(! $found) {
