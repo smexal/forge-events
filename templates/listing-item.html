@@ -1,4 +1,4 @@
-<a class="listing-item event" href="{$url}">
+<a class="listing-item event {$classes}" {if="$url"}href="{$url}"{/if} {if="$image"}style="background-image:url('{$image}');"{/if}>
     <p class="alternative">{$start_date} – {$end_date}</p>
     <h3>{$title}</h3>
     <p class="description">{$description}</p>

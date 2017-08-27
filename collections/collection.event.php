@@ -26,6 +26,9 @@ class EventCollection extends DataCollection {
     }
 
     public function render($item) {
+        if($item->getMeta('hide-detail')) {
+            App::instance()->redirect('404');
+        }
         return App::instance()->render(MOD_ROOT.'forge-events/templates/', 'event-detail', [
             'title' => $item->getMeta('title'),
             'lead' => $item->getMeta('description'),
@@ -35,7 +38,7 @@ class EventCollection extends DataCollection {
             'address' => $item->getMeta('address'),
             'signup' => $item->getMeta('allow-signup'),
             'signup_text' => i('Signup for this event', 'forge-events'),
-            'signup_url' => Utils::url(['event-signup', $item->id])
+            'signup_url' => Utils::url(['event-signup', $item->slug()])
         ]);
     }
 
@@ -164,6 +167,15 @@ class EventCollection extends DataCollection {
                         'hint' => ''
                     ),
                     array(
+                        'key' => 'hide-detail',
+                        'label' => i('Hide Detail', 'forge-events'),
+                        'multilang' => true,
+                        'type' => 'checkbox',
+                        'order' => 40,
+                        'position' => 'right',
+                        'hint' => i('If this checkbox is active, people will not be able to check the detail page.', 'forge-events')
+                    ),
+                    array(
                         'key' => 'start-date',
                         'label' => i('Start Date', 'forge-events'),
                         'multilang' => true,
@@ -214,6 +226,15 @@ class EventCollection extends DataCollection {
                         'multilang' => false,
                         'type' => 'number',
                         'order' => 20,
+                        'position' => 'right',
+                        'hint' => ''
+                    ),
+                    array(
+                        'key' => 'header_image',
+                        'label' => i('Header Image', 'forge-events'),
+                        'multilang' => false,
+                        'type' => 'image',
+                        'order' => 40,
                         'position' => 'right',
                         'hint' => ''
                     )

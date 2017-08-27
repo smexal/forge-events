@@ -47,7 +47,7 @@ class Participants {
 
     public function getThs() {
         $ths = [];
-        $ths[] = Utils::tableCell(i('Seat ID', 'forge-events'));
+        $ths[] = Utils::tableCell('');
         $ths[] = Utils::tableCell(i('Username', 'forge-events'));
         $ths[] = Utils::tableCell(i('E-Mail', 'forge-events'));
         $ths[] = Utils::tableCell(i('Seat', 'forge-events'));
@@ -81,7 +81,12 @@ class Participants {
                 }
             }
             $td = [];
-            $td[] = Utils::tableCell($part['id']);
+            if(! is_null($user->getAvatar())) {
+                $avatar = '<img src="'.$user->getAvatar().'" style="border-radius: 15px; width: 30px; max-height:30px; margin-left: 10px; "/>';
+            } else {
+                $avatar = '';
+            }
+            $td[] = Utils::tableCell($avatar);
             $td[] = Utils::tableCell($user->get('username'));
             $td[] = Utils::tableCell($user->get('email'));
             $td[] = Utils::tableCell($part['x'].':'.$part['y']);

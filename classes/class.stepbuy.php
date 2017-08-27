@@ -79,7 +79,7 @@ class SignupStepBuy {
             'colspan' => 4,
             'label' => i('Total amount'),
             'total' => $this->getTotalAmount($users),
-            'bbuyall' => $this->getAction($users)
+            'bbuyall' => $this->getAction($users, 'btn-primary')
         );
     }
 
@@ -242,7 +242,7 @@ class SignupStepBuy {
         );
     }
 
-    public function getAction($users) {
+    public function getAction($users, $class='btn-discreet') {
         $collection = $this->event->getCollection();
         $ticketUser = false;
         if (is_array($users)) {
@@ -282,6 +282,7 @@ class SignupStepBuy {
                 ));
             }
             return Payment::button(array(
+                "class" => $class,
                 "items" => $items,
                 "title" => $this->event->getMeta('title'),
                 "label" => $label,

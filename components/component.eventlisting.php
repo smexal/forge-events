@@ -5,6 +5,7 @@ namespace Forge\Modules\ForgeEvents;
 use Forge\Core\App\App;
 use Forge\Core\App\ModifyHandler;
 use Forge\Core\Components\ListingComponent;
+use Forge\Core\Classes\Media;
 
 
 class EventlistingComponent extends ListingComponent {
@@ -21,6 +22,12 @@ class EventlistingComponent extends ListingComponent {
                 "hint" => 'Title, which will be displayed on top of the listing.',
                 'key' => 'title',
                 'type' => 'text',
+            ],
+            [
+                "label" => i('Display Image', 'forge-events'),
+                "hint" => i('Display event image as background.', 'forge-events'),
+                'key' => 'display_image',
+                'type' => 'checkbox',
             ]
         ];
         return array(
@@ -39,7 +46,7 @@ class EventlistingComponent extends ListingComponent {
     }
 
     public function arraySort( $a, $b ) {
-        if(! $a->getMeta('start-date') || ! $b->getMeta('start-date')) {
+        if(! $a->getMeta('start-date')) {
             return -1;
         }
         $tA = new \DateTime($a->getMeta('start-date'));
@@ -48,7 +55,7 @@ class EventlistingComponent extends ListingComponent {
         $cmpB = $tB->getTimestamp();
 
         if(is_string($cmpA)) {
-            return -1;
+            return 1;
         }
 
         if( $cmpA == $cmpB ) {
@@ -58,13 +65,28 @@ class EventlistingComponent extends ListingComponent {
     }
 
     public function renderItem($item) {
+        if( $this->getField('display_image') === 'on' && $imgId = $item->getMeta('collection_image') ) {
+            $image = new Media($imgId);
+        } else {
+            $image = false;
+        }
+        $classes = '';
+        $startdate = new \DateTime($item->getMeta('start-date'));
+        $datenow = new \DateTime();
+        if($datenow < $startdate) {
+            $classes.= 'upcoming';
+        } else {
+            $classes.= 'past';
+        }
         return App::instance()->render(MOD_ROOT.'forge-events/templates/', 'listing-item', array(
+            'classes' => $classes,
             'title' => $item->getMeta('title'),
             'description' => $item->getMeta('description'),
             'start_date' => $item->getMeta('start-date'),
             'end_date' => $item->getMeta('end-date'),
+            'image' => $image ? $image->getUrl() : false,
             'text' => $item->getMeta('text'),
-            'url' => $item->url()
+            'url' => $item->getMeta('hide-detail') == 'on' ? false : $item->url()
         ));
     }
 }
