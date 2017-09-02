@@ -5,6 +5,7 @@ namespace Forge\Modules\ForgeEvents;
 use \Forge\Core\Classes\Utils;
 use \Forge\Core\Classes\User;
 use \Forge\Core\Classes\TableBar;
+use \Forge\Core\Classes\CollectionItem;
 use \Forge\Core\App\App;
 
 class Participants {
@@ -13,6 +14,7 @@ class Participants {
      */
     private $eventId = false;
     private $searchTerm = false;
+    public $isAdmin = false;
 
     public function __construct($eventId) {
         $this->eventId = $eventId;
@@ -49,51 +51,88 @@ class Participants {
         $ths = [];
         $ths[] = Utils::tableCell('');
         $ths[] = Utils::tableCell(i('Username', 'forge-events'));
-        $ths[] = Utils::tableCell(i('E-Mail', 'forge-events'));
-        $ths[] = Utils::tableCell(i('Seat', 'forge-events'));
-        $ths[] = Utils::tableCell(i('Actions', 'forge-events'));
+        if($this->isAdmin) {
+            $ths[] = Utils::tableCell(i('E-Mail', 'forge-events'));
+        }
+        $colItem = new CollectionItem($this->eventId);
+        if( $colItem->getMeta('disable-seatplan') !== 'on') {
+            $ths[] = Utils::tableCell(i('Seat', 'forge-events'));
+        }
+        if($this->isAdmin) {
+            $ths[] = Utils::tableCell(i('Actions', 'forge-events'));
+        }
         return $ths;
     }
 
     public function getParticipants() {
+        $itm = new CollectionItem($this->eventId);
         $db = App::instance()->db;
-        $db->where('event_id', $this->eventId);
-        $db->orderBy("x","asc");
-        $db->orderBy("y","asc");
+        $withSeatplan = true;
+        if($itm->getMeta('disable-seatplan')) {
+            $withSeatplan = false;
+            $parts = [];
+            //collection%22%3A11
+            $db->where('meta', '%collection%22%3A'.$itm->id.'%', 'LIKE');
+            $parts = $db->get('forge_payment_orders');
+        } else {
+            $db->where('event_id', $this->eventId);
+            $db->orderBy("x","asc");
+            $db->orderBy("y","asc");
 
-        $parts = $db->get('forge_events_seat_reservations');
+            $parts = $db->get('forge_events_seat_reservations');
+        }
         $tds = [];
         foreach($parts as $part) {
-            $user = new User($part['user']);
-            if($this->searchTerm) {
-                $found = false;
-                if(strstr(strtolower($user->get('username')), strtolower($this->searchTerm))) {
-                    $found = true;
+            if(! $withSeatplan) {
+                $meta = json_decode(urldecode($part['meta']));
+                foreach($meta->items as $item) {
+                    $user = new User($item->user);
+                    $tds[] = $this->getParticipantTd($user);
                 }
-                if(strstr(strtolower($user->get('email')), strtolower($this->searchTerm))) {
-                    $found = true;
-                }
+            } else {
+                $user = new User($part['user']);
+                $tds[] = $this->getParticipantTd($user, $part);
+            }
+        }
+        return $tds;
+    }
+
+    private function getParticipantTd($user, $part = null) {
+        if($this->searchTerm) {
+            $found = false;
+            if(strstr(strtolower($user->get('username')), strtolower($this->searchTerm))) {
+                $found = true;
+            }
+            if(strstr(strtolower($user->get('email')), strtolower($this->searchTerm))) {
+                $found = true;
+            }
+            if(! is_null($part)) {
                 if(strstr(strtolower($part['x'].':'.$part['y']), strtolower($this->searchTerm))) {
                     $found = true;
                 }
-                if(! $found) {
-                    continue;
-                }
             }
-            $td = [];
-            if(! is_null($user->getAvatar())) {
-                $avatar = '<img src="'.$user->getAvatar().'" style="border-radius: 15px; width: 30px; max-height:30px; margin-left: 10px; "/>';
-            } else {
-                $avatar = '';
+            if(! $found) {
+                return;
             }
-            $td[] = Utils::tableCell($avatar);
-            $td[] = Utils::tableCell($user->get('username'));
-            $td[] = Utils::tableCell($user->get('email'));
-            $td[] = Utils::tableCell($part['x'].':'.$part['y']);
-            $td[] = Utils::tableCell($this->actions($part['id']));
-            $tds[] = $td;
         }
-        return $tds;
+        $td = [];
+        if(! is_null($user->getAvatar())) {
+            $avatar = '<img src="'.$user->getAvatar().'" style="border-radius: 15px; width: 30px; max-height:30px; margin-left: 10px; "/>';
+        } else {
+            $avatar = '';
+        }
+        $td[] = Utils::tableCell($avatar);
+        $td[] = Utils::tableCell($user->get('username'));
+        if($this->isAdmin) {
+            $td[] = Utils::tableCell($user->get('email'));
+        }
+        if(! is_null($part)) {
+            $td[] = Utils::tableCell($part['x'].':'.$part['y']);
+        }
+        if($this->isAdmin) {
+            $td[] = Utils::tableCell($this->actions($part['id']));
+        }
+        return $td;
     }
 
     private function actions($id) {

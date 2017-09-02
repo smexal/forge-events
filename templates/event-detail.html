@@ -1,25 +1,119 @@
-<div class="intro-infos">
+<div class="hero" {if="$header_image"}style="background-image:url({$header_image});"{/if}>
     <div class="wrapped">
-        <p class="alternative">{$start_date} – {$end_date}</p>
-        <h1>{$title}</h1>
-        <p class="lead">{$lead}</p>
-        <div class="text">
-        {$text}
+        <div class="row">
+            <div class="col-md-8 col-sm-12">
+                <h1>{$title}</h1>
+                <p class="lead">{$lead}</p>
+            </div>
+            <div class="col-md-6 col-sm-12">
+            </div>
         </div>
     </div>
 </div>
-{if="$signup"}
-<div class="signup">
+<div class="intro-infos">
     <div class="wrapped">
-        <a href="{$signup_url}" class="btn btn-primary">{$signup_text}</a>
+        <div class="row">
+            <div class="col-lg-6 col-sm-12">
+                <div class="text">
+                {$text}
+                </div>
+            </div>
+            <div class="col-lg-2 col-sm-12"></div>
+            <div class="col-lg-4 col-sm-12">
+                <div class="facts-block no-marg">
+                    <span class="before">{$start_date_label}</span>
+                    <span class="main">{$start_date}</span>
+                </div>
+                <div class="facts-block smaller">
+                    <span class="before">{$location_label}</span>
+                    <span class="main">{$location}</span>
+                </div>
+                <div class="facts-block">
+                    <span class="before">{$participants_amount_label}</span>
+                    <span class="main">{$participants_amount}</span>
+                </div>
+                <div class="facts-block">
+                    <span class="before">{$price_label}</span>
+                    <span class="main">{$price}</span>
+                </div>
+                {if="$signup"}
+                <div class="signup">
+                    <div class="wrapped">
+                        <a href="{$signup_url}" class="btn btn-primary">{$signup_text}</a>
+                    </div>
+                </div>
+                {/if}
+            </div>
+        </div>
     </div>
 </div>
-{/if}
-{if="$address"}
-<div class="map">
+<div class="additional-information">
     <div class="wrapped">
-        <div class="highlight">{$address}</div>
-        <div id="map_canvas" data-address="{$address}"></div>
+        <div class="row">
+            <div class="col-lg-12">
+                <ul class="nav nav-tabs">
+                    {if="$address"}
+                        <li class="active">
+                            <a data-toggle="tab" href="#locationinfos">{$location_info_label}</a>
+                        </li>
+                    {/if}
+                    <li class="">
+                        <a data-toggle="tab" href="#participants">{$participants_label}</a>
+                    </li>
+                    {if="$seatplan"}
+                    <li class="">
+                        <a data-toggle="tab" href="#seatplan">{$seatplan_label}</a>
+                    </li>
+                    {/if}
+                    {if="$additional"}
+                    <li class="">
+                        <a data-toggle="tab" href="#additional">{$additional_label}</a>
+                    </li>
+                    {/if}
+                </ul>
+                <div class="tab-content">
+                    <!-- Participants -->
+                    <div id="participants" class="tab-pane fade in">
+                        <div class="row">
+                            {$participantsTable}
+                        </div>
+                    </div>
+
+                    {if="$seatplan"}
+                    <!-- Seatplan -->
+                    <div id="seatplan" class="tab-pane fade in">
+                        <div class="row">
+                            {$seatplan}
+                        </div>
+                    </div>
+                    {/if}
+
+                    {if="$additional"}
+                    <!-- Seatplan -->
+                    <div id="additional" class="tab-pane fade in">
+                        <div class="row">
+                            {$additional}
+                        </div>
+                    </div>
+                    {/if}
+
+                    <!-- Location Infos -->
+                    <div id="locationinfos" class="tab-pane fade in active">
+                        <div class="row">
+                            <div class="col-lg-6 col-sm-12">
+                                {$location_info}
+                            </div>
+                            <div class="col-lg-6 col-sm-12">
+                            {if="$address"}
+                                <div class="map">
+                                    <div id="map_canvas" data-address="{$address}"></div>
+                                </div>
+                            {/if}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-{/if}

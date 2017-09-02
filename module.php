@@ -68,6 +68,7 @@ class ForgeEvents extends Module {
         // frontend
         App::instance()->tm->theme->addScript($this->url()."assets/scripts/forge-events.js", true);
 
+        App::instance()->tm->theme->addScript(CORE_WWW_ROOT."ressources/scripts/tablebar.js", true);
         App::instance()->tm->theme->addScript(CORE_WWW_ROOT."ressources/scripts/externals/tooltipster.bundle.min.js", true);
 
         // google maps
@@ -108,6 +109,9 @@ class ForgeEvents extends Module {
         switch ($data['query'][0]) {
             case 'participants':
                 $participants = new Participants($data['query'][1]);
+                if(Auth::allowed('manage.forge-events', true)) {
+                    $participants->isAdmin = true;
+                }
                 return $participants->handleQuery($data['query'][2]);
             case 'seatplan':
                 if (array_key_exists('event', $data['data'])) {

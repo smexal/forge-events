@@ -8,6 +8,8 @@ use \Forge\Core\App\App;
 use \Forge\Core\App\Auth;
 use \Forge\Core\Classes\User;
 use \Forge\Core\Classes\Utils;
+use \Forge\Core\Classes\Media;
+use \Forge\Core\Classes\CollectionItem;
 
 
 
@@ -26,27 +28,64 @@ class EventCollection extends DataCollection {
     }
 
     public function render($item) {
+
         if($item->getMeta('hide-detail')) {
             App::instance()->redirect('404');
         }
+        $header_image = false;
+        if($header_image = $item->getMeta('header_image')) {
+            $header_image = new Media($header_image);
+        }
+
+        $participants = new Participants($item->id);
+        if(Auth::allowed('manage.forge-events', true)) {
+            $participants->isAdmin = true;
+        }
+        $participantsTable = $participants->renderTable();
+        if($item->getMeta('disable-seatplan') == 'on') {
+            $seatplan = false;
+        } else {
+            $seatplan = new Seatplan($item->id, true);
+            $seatplan->actions = false;
+        }
+
+        $ticketsAvailable = $this->getEventMaximumAmount($item->id) > $this->getEventSoldAmount($item->id);
+
         return App::instance()->render(MOD_ROOT.'forge-events/templates/', 'event-detail', [
+            'header_image' => $header_image ? $header_image->getUrl() : false,
             'title' => $item->getMeta('title'),
             'lead' => $item->getMeta('description'),
             'text' => $item->getMeta('text'),
+            'start_date_label' => i('Starting date', 'forge-events'),
             'start_date' => $item->getMeta('start-date'),
+            'location_label' => i('Location', 'forge-events'),
+            'location' => $item->getMeta('address'),
+            'price_label' => i('Price', 'forge-events'),
+            'price' => Utils::formatAmount($item->getMeta('price'), true),
+            'participants_amount_label' => i('Amount of participants', 'forge-events'),
+            'participants_amount' => $this->getEventMaximumAmount($item->id),
             'end_date' => $item->getMeta('end-date'),
             'address' => $item->getMeta('address'),
             'signup' => $item->getMeta('allow-signup'),
-            'signup_text' => i('Signup for this event', 'forge-events'),
-            'signup_url' => Utils::url(['event-signup', $item->slug()])
+            'signup_text' => $ticketsAvailable ? i('Signup now', 'forge-events') : i('Sold out', 'forge-events'),
+            'signup_url' => $ticketsAvailable ? Utils::url(['event-signup', $item->slug()]) : '#',
+            'location_info_label' => i('Location', 'forge-events'),
+            'location_info' => $item->getMeta('location-info'),
+            'participantsTable' => $participantsTable,
+            'participants_label' => i('Participants', 'forge-events'),
+            'seatplan_label' => i('Seatplan', 'forge-events'),
+            'seatplan' => $seatplan ? $seatplan->draw() : false,
+            'additional' => $item->getMeta('additional-info'),
+            'additional_label' => i('Additional Information', 'forge-events')
         ]);
     }
 
     public function customEditContent($id) {
         $this->itemId = $id;
+        $colItem = new CollectionItem($id);
 
         $return = '';
-        if(Settings::get('forge-events-seatplan')) {
+        if(Settings::get('forge-events-seatplan') && $colItem->getMeta('disable-seatplan') != 'on') {
             $return.= $this->seatPlan();
         }
 
@@ -69,6 +108,9 @@ class EventCollection extends DataCollection {
         }
 
         $participants = new Participants($itemId);
+        if(Auth::allowed('manage.forge-events', true)) {
+            $participants->isAdmin = true;
+        }
 
         if(array_key_exists('deleteSeat', $_GET) && is_numeric($_GET['deleteSeat'])) {
             $participants->delete($_GET['deleteSeat']);
@@ -130,13 +172,38 @@ class EventCollection extends DataCollection {
     }
 
     public function getEventMaximumAmount($eventId) {
-        $sp = new Seatplan($eventId);
-        return $sp->getSeatAmount();
+        $colItem = new CollectionItem($eventId);
+        if($colItem->getMeta('disable-seatplan') == 'on') {
+            return $colItem->getMeta('amount-of-participants');
+        } else {
+            $sp = new Seatplan($eventId);
+            return $sp->getSeatAmount();
+        }
     }
 
     public function getEventSoldAmount($eventId) {
-        $sp = new Seatplan($eventId);
-        return $sp->getSoldAmount();
+        $colItem = new CollectionItem($eventId);
+        if($colItem->getMeta('disable-seatplan') == 'on') {
+            return $this->getSoldAmountByPayments($eventId);
+        } else {
+            $sp = new Seatplan($eventId);
+            return $sp->getSoldAmount();
+        }
+    }
+
+    public function getSoldAmountByPayments($itemId) {
+        $amt = 0;
+        $db = App::instance()->db;
+        $db->where('meta', '%collection%22%3A'.$itemId.'%', 'LIKE');
+        $db->where('status', 'success');
+        $parts = $db->get('forge_payment_orders');
+        foreach($parts as $part) {
+            $meta = json_decode(urldecode($part['meta']));
+            foreach($meta->items as $item) {
+                $amt++;
+            }
+        }
+        return $amt;
     }
 
     private function seatPlan() {
@@ -237,6 +304,27 @@ class EventCollection extends DataCollection {
                         'order' => 40,
                         'position' => 'right',
                         'hint' => ''
+                    ),
+                    array (
+                        'key' => 'location-info',
+                        'label' => i('Location Informations', 'forge-events'),
+                        'type' => 'wysiwyg',
+                        'order' => 80,
+                        'position' => 'left'
+                    ),
+                    array (
+                        'key' => 'additional-info',
+                        'label' => i('Additional Informations', 'forge-events'),
+                        'type' => 'wysiwyg',
+                        'order' => 90,
+                        'position' => 'left'
+                    ),
+                    array (
+                        'key' => 'disable-seatplan',
+                        'label' => i('Disable Seatplan Management', 'forge-events'),
+                        'type' => 'checkbox',
+                        'order' => 80,
+                        'position' => 'right'
                     )
                 ],
                 $this->seatPlanRows()

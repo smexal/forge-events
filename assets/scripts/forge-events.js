@@ -9,6 +9,9 @@ var forgeEvents = {
             var plan = $(this);
             var apiUrl = $(this).data('api');
             var eventId = $(this).data('event');
+            if(! apiUrl && ! eventId) {
+                return;
+            }
             $(this).find(".s-row").each(function() {
                 var row = $(this).data('row-id');
                 $(this).find(".cell").each(function() {

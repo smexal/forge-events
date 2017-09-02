@@ -99,7 +99,9 @@ class TicketprintView extends View {
         $offsetY+=12;
         $this->pdf->file->Line($offsetLeft, $offsetY, $outerRight, $offsetY);
         
-        $seatplan = new Seatplan($item->collection);
+        if($titleCollection->getMeta('disable-seatplan') !== 'on') {
+            $seatplan = new Seatplan($item->collection);
+        }
         $user = new User($item->user);
 
         $offsetY+= 4;
@@ -112,16 +114,17 @@ class TicketprintView extends View {
         $this->pdf->file->SetXY($offsetLeft, $offsetY);
         $this->pdf->file->Cell(50, 6, utf8_decode($user->get('username')).' ('.utf8_decode($user->get('email')).')', 0);
 
-        $offsetY+= 10;
-        $this->pdf->file->SetFont('Arial','', $this->fontSizeLabel);
-        $this->pdf->file->SetXY($offsetLeft, $offsetY);
-        $this->pdf->file->Cell(50, 6, utf8_decode(i('Seat', 'forge-events')), 0);
+        if($titleCollection->getMeta('disable-seatplan') !== 'on') {
+            $offsetY+= 10;
+            $this->pdf->file->SetFont('Arial','', $this->fontSizeLabel);
+            $this->pdf->file->SetXY($offsetLeft, $offsetY);
+            $this->pdf->file->Cell(50, 6, utf8_decode(i('Seat', 'forge-events')), 0);
 
-        $offsetY+= 5;
-        $this->pdf->file->SetFont('Arial','', $this->fontSizeValue);
-        $this->pdf->file->SetXY($offsetLeft, $offsetY);
-        $this->pdf->file->Cell(50, 6, utf8_decode($seatplan->getUserSeat($user->get('id'))), 0);
-
+            $offsetY+= 5;
+            $this->pdf->file->SetFont('Arial','', $this->fontSizeValue);
+            $this->pdf->file->SetXY($offsetLeft, $offsetY);
+            $this->pdf->file->Cell(50, 6, utf8_decode($seatplan->getUserSeat($user->get('id'))), 0);
+        }
 
         $offsetY+= 10;
         $this->pdf->file->SetFont('Arial','', $this->fontSizeLabel);

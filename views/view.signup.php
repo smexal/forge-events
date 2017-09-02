@@ -44,6 +44,15 @@ class SignupView extends View {
             $this->completeOrder();
         }
 
+        $collection = $this->event->getCollection();
+        $ticketsAvailable = $collection->getEventMaximumAmount($this->event->id) > $collection->getEventSoldAmount($this->event->id);
+        if(! $ticketsAvailable) {
+            return App::instance()->render(CORE_TEMPLATE_DIR."views/", "denied", array(
+                'title' => i('Sold out', 'forge-events'),
+                'text' => i('The event you are trying to buy a ticket for is already sold out.', 'forge-events')
+            ));
+        }
+
         return App::instance()->render(MOD_ROOT."forge-events/templates/", "signup", array(
             'title' => sprintf(i('Signup for %s'), $this->event->getMeta('title')),
             'steps' => $this->signup->getSteps(),

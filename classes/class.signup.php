@@ -19,7 +19,9 @@ class Signup {
 
         $this->steps['user'] = new SignupStepUser();
         $this->steps['buy'] = new SignupStepBuy($this->event);
-        $this->steps['seat'] = new SignupStepSeat($this->event);
+        if( $this->event->getMeta('disable-seatplan') !== 'on') {
+            $this->steps['seat'] = new SignupStepSeat($this->event);
+        }
     }
 
     public function getContents() {
@@ -51,17 +53,20 @@ class Signup {
     private function getActive() {
         if( $this->steps['user']->allowed() &&
             $this->steps['buy']->allowed() &&
-            $this->steps['seat']->allowed()) {
+            ($this->event->getMeta('disable-seatplan') != 'on'
+                && $this->steps['seat']->allowed())) {
             return 'seat';
         }
         if( $this->steps['user']->allowed() &&
             $this->steps['buy']->allowed() &&
-            ! $this->steps['seat']->allowed()) {
+            ($this->event->getMeta('disable-seatplan') == 'on'
+                || ! $this->steps['seat']->allowed())) {
             return 'buy';
         }
         if( $this->steps['user']->allowed() &&
             ! $this->steps['buy']->allowed() &&
-            ! $this->steps['seat']->allowed()) {
+            ($this->event->getMeta('disable-seatplan') == 'on'
+                || ! $this->steps['seat']->allowed())) {
             return 'user';
         }
     }

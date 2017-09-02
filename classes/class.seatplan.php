@@ -20,6 +20,7 @@ class Seatplan {
     private $trim = false;
     private $db = null;
     private $soldSeats = null;
+    public $actions = true;
     private $seatStatus = array(
         0 => 'available',
         1 => 'blocked',
@@ -52,7 +53,8 @@ class Seatplan {
             'event_id' => $this->event,
             'api_url' => Utils::getUrl(array("api", "forge-events", "seatplan", "toggle-seat")),
             'column_names' => $this->getRow(1),
-            'rows' => $this->getSeatRows()
+            'rows' => $this->getSeatRows(),
+            'actions' => $this->actions
         ));
     }
 
@@ -169,7 +171,11 @@ class Seatplan {
     }
 
     private function isUserSeat($x, $y) {
-        $ordersOfThisUser = Payment::getPayments(App::instance()->user->get('id'));
+        if(App::instance()->user) {
+            $ordersOfThisUser = Payment::getPayments(App::instance()->user->get('id'));
+        } else {
+            $ordersOfThisUser = [];
+        }
         foreach($ordersOfThisUser as $order) {
             foreach($order['meta']->items as $item) {
                 $this->db->where('user', $item->user);
