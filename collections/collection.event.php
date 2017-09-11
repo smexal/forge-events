@@ -51,6 +51,11 @@ class EventCollection extends DataCollection {
 
         $ticketsAvailable = $this->getEventMaximumAmount($item->id) > $this->getEventSoldAmount($item->id);
 
+        $buttonText = i('Signup now', 'forge-events');
+        if(! $ticketsAvailable) {
+            $buttonText = i('Sold out', 'forge-events');
+        }
+
         return App::instance()->render(MOD_ROOT.'forge-events/templates/', 'event-detail', [
             'header_image' => $header_image ? $header_image->getUrl() : false,
             'title' => $item->getMeta('title'),
@@ -67,7 +72,7 @@ class EventCollection extends DataCollection {
             'end_date' => $item->getMeta('end-date'),
             'address' => $item->getMeta('address'),
             'signup' => $item->getMeta('allow-signup'),
-            'signup_text' => $ticketsAvailable ? i('Signup now', 'forge-events') : i('Sold out', 'forge-events'),
+            'signup_text' => $buttonText,
             'signup_url' => $ticketsAvailable ? Utils::url(['event-signup', $item->slug()]) : '#',
             'location_info_label' => i('Location', 'forge-events'),
             'location_info' => $item->getMeta('location-info'),
@@ -227,7 +232,7 @@ class EventCollection extends DataCollection {
                     array(
                         'key' => 'allow-signup',
                         'label' => i('Allow Event Signups', 'forge-events'),
-                        'multilang' => true,
+                        'multilang' => false,
                         'type' => 'checkbox',
                         'order' => 20,
                         'position' => 'right',
