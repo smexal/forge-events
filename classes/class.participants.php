@@ -2,11 +2,11 @@
 
 namespace Forge\Modules\ForgeEvents;
 
-use \Forge\Core\Classes\Utils;
-use \Forge\Core\Classes\User;
-use \Forge\Core\Classes\TableBar;
-use \Forge\Core\Classes\CollectionItem;
-use \Forge\Core\App\App;
+use Forge\Core\App\App;
+use Forge\Core\Classes\CollectionItem;
+use Forge\Core\Classes\TableBar;
+use Forge\Core\Classes\User;
+use Forge\Core\Classes\Utils;
 
 class Participants {
     /*
@@ -83,16 +83,18 @@ class Participants {
         }
         $tds = [];
         foreach($parts as $part) {
+            $row = new \stdClass();
             if(! $withSeatplan) {
                 $meta = json_decode(urldecode($part['meta']));
                 foreach($meta->items as $item) {
                     $user = new User($item->user);
-                    $tds[] = $this->getParticipantTd($user);
+                    $row->tds = $this->getParticipantTd($user);
                 }
             } else {
                 $user = new User($part['user']);
-                $tds[] = $this->getParticipantTd($user, $part);
+                $row->tds = $this->getParticipantTd($user, $part);
             }
+            array_push($tds, $row);
         }
         return $tds;
     }

@@ -2,17 +2,16 @@
 
 namespace Forge\Modules\ForgeEvents;
 
-use \Forge\Core\Classes\Utils;
-use \Forge\Core\Abstracts\Module;
-use \Forge\Core\App\API;
-use \Forge\Core\App\App;
-use \Forge\Core\App\Auth;
-use \Forge\Core\App\ModifyHandler;
-use \Forge\Core\Classes\Fields;
-use \Forge\Core\Classes\Logger;
-use \Forge\Core\Classes\Settings;
-use \Forge\Loader;
-
+use Forge\Core\Abstracts\Module;
+use Forge\Core\App\API;
+use Forge\Core\App\App;
+use Forge\Core\App\Auth;
+use Forge\Core\App\ModifyHandler;
+use Forge\Core\Classes\Fields;
+use Forge\Core\Classes\Logger;
+use Forge\Core\Classes\Settings;
+use Forge\Core\Classes\Utils;
+use Forge\Loader;
 
 
 class ForgeEvents extends Module {
@@ -91,7 +90,8 @@ class ForgeEvents extends Module {
         $ths[] = [
             'id' => 'ticket',
             'content' => i('Ticket', 'forge-events'),
-            'class' => ''
+            'class' => '',
+            'cellAction' => ''
         ];
         return $ths;
     }
@@ -100,7 +100,8 @@ class ForgeEvents extends Module {
         $td[] = [
             'id' => 'ticket',
             'content' => '<a target="blank" href="'.Utils::getUrl(['fe-ticket-print', $args['order']]).'">'.i('Print Ticket', 'forge-events').'</a>',
-            'class' => ''
+            'class' => '',
+            'cellAction' => ''
         ];
         return $td;
     }
