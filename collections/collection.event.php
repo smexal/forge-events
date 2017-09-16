@@ -23,6 +23,8 @@ class EventCollection extends DataCollection {
         $this->preferences['all-title'] = i('Manage Events', 'forge-events');
         $this->preferences['add-label'] = i('Add event', 'forge-events');
         $this->preferences['single-item'] = i('Event', 'forge-events');
+        $this->preferences['has_image'] = true;
+        $this->preferences['has_password'] = true;
 
         $this->custom_fields();
     }
