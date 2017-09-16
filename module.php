@@ -95,6 +95,17 @@ class ForgeEvents extends Module
         // register API
         API::instance()->register('forge-events', array($this, 'apiEventsAdapter'));
         API::instance()->register('checkin', array($this, 'apiCheckinAdapter'));
+
+        // backend navigation
+        ModifyHandler::instance()->add('modify_manage_navigation', [$this, 'modifyManageNavigation']);
+    }
+
+    public function modifyManageNavigation($navigation)
+    {
+        if(Auth::allowed($this->permission_checkin, true)) {
+            $navigation->add('checkin', i('Event checkin'), Utils::getUrl(array('manage', 'checkin')), 'leftPanel', 'exit_to_app');
+        }
+        return $navigation;
     }
 
     public function orderTableHeading($ths)
