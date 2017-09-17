@@ -14,6 +14,9 @@ var forgeCheckin = {
             }).done(function(data) {
                 $('.checkin-feedback').addClass(data.status);
                 $('.checkin-feedback .status').text(data.text);
+            }).fail(function() {
+                $('.checkin-feedback').addClass('error');
+                $('.checkin-feedback .status').text('ERROR');
             });
         });
         forgeCheckin.activateScan(scanner);
