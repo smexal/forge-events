@@ -37,8 +37,8 @@ class Participants {
                 $this->searchTerm = $_GET['t'];
                 return json_encode([
                     'newTable' => App::instance()->render(
-                        CORE_TEMPLATE_DIR.'assets/', 
-                        'table-rows', 
+                        CORE_TEMPLATE_DIR.'assets/',
+                        'table-rows',
                         ['td' => $this->getParticipants()]
                     )
                 ]);
@@ -81,20 +81,22 @@ class Participants {
 
             $parts = $db->get('forge_events_seat_reservations');
         }
-        $tds = [];
+        $rows = [];
         foreach($parts as $part) {
+            $row = new \stdClass();
             if(! $withSeatplan) {
                 $meta = json_decode(urldecode($part['meta']));
                 foreach($meta->items as $item) {
                     $user = new User($item->user);
-                    $tds[] = $this->getParticipantTd($user);
+                    $row->tds = $this->getParticipantTd($user);
                 }
             } else {
                 $user = new User($part['user']);
-                $tds[] = $this->getParticipantTd($user, $part);
+                $row->tds = $this->getParticipantTd($user, $part);
             }
+            $rows[] = $row;
         }
-        return $tds;
+        return $rows;
     }
 
     private function getParticipantTd($user, $part = null) {
