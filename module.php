@@ -2,42 +2,46 @@
 
 namespace Forge\Modules\ForgeEvents;
 
-use \Forge\Core\Classes\Utils;
-use \Forge\Core\Abstracts\Module;
-use \Forge\Core\App\API;
-use \Forge\Core\App\App;
-use \Forge\Core\App\Auth;
-use \Forge\Core\App\ModifyHandler;
-use \Forge\Core\Classes\Fields;
-use \Forge\Core\Classes\Logger;
-use \Forge\Core\Classes\Settings;
-use \Forge\Loader;
+use Forge\Core\Abstracts\Module;
+use Forge\Core\App\API;
+use Forge\Core\App\App;
+use Forge\Core\App\Auth;
+use Forge\Core\App\ModifyHandler;
+use Forge\Core\Classes\Fields;
+use Forge\Core\Classes\Logger;
+use Forge\Core\Classes\Settings;
+use Forge\Core\Classes\Utils;
+use Forge\Loader;
+use Forge\Modules\ForgePayment\Payment;
 
 
-
-class ForgeEvents extends Module {
+class ForgeEvents extends Module
+{
     private $permission = 'manage.forge-events';
+    private $permission_checkin = 'manage.checkin';
 
-    public function setup() {
+    public function setup()
+    {
         $this->version = '0.1.0';
         $this->id = "forge-events";
         $this->name = i('Event Management', 'forge-events');
         $this->description = i('Event Management for Forge.', 'forge-events');
-        $this->image = $this->url().'assets/images/module-image.png';
+        $this->image = $this->url() . 'assets/images/module-image.png';
     }
 
-    public function start() {
+    public function start()
+    {
         $this->install();
         $this->registerSettings();
 
 
-        if(App::instance()->mm->isActive('forge-payment')) {
+        if (App::instance()->mm->isActive('forge-payment')) {
             ModifyHandler::instance()->add(
-                'modify_order_table_th', 
+                'modify_order_table_th',
                 [$this, 'orderTableHeading']
             );
             ModifyHandler::instance()->add(
-                'modify_order_table_td', 
+                'modify_order_table_td',
                 [$this, 'orderTableRow']
             );
         }
@@ -46,13 +50,14 @@ class ForgeEvents extends Module {
         Auth::registerPermissions($this->permission);
         Auth::registerPermissions("manage.forge-events.ticket-status.view");
         Auth::registerPermissions("manage.forge-events.ticket-status.edit");
+        Auth::registerPermissions($this->permission_checkin);
 
-        if(Settings::get('forge-events-seatplan')) {
+        if (Settings::get('forge-events-seatplan')) {
             ModifyHandler::instance()->add(
                 'core_delete_user',
-                function($user) {
+                function ($user) {
                     // delete user seat reservations, when user gets deleted.
-                    if(is_numeric($user)) {
+                    if (is_numeric($user)) {
                         $db = App::instance()->db;
                         $db->where('user', $user);
                         $db->delete('forge_events_seat_reservations');
@@ -64,52 +69,73 @@ class ForgeEvents extends Module {
         // backend
         Loader::instance()->addStyle("modules/forge-events/assets/css/forge-events.less");
         Loader::instance()->addScript("modules/forge-events/assets/scripts/forge-events.js");
+        Loader::instance()->addScript("modules/forge-events/assets/scripts/instascan.min.js");
+        Loader::instance()->addScript("modules/forge-events/assets/scripts/forge-checkin.js");
+        Loader::instance()->addStyle("modules/forge-events/assets/css/forge-checkin.less");
 
         // frontend
-        App::instance()->tm->theme->addScript($this->url()."assets/scripts/forge-events.js", true);
+        App::instance()->tm->theme->addScript($this->url() . "assets/scripts/forge-events.js", true);
 
-        App::instance()->tm->theme->addScript(CORE_WWW_ROOT."ressources/scripts/tablebar.js", true);
-        App::instance()->tm->theme->addScript(CORE_WWW_ROOT."ressources/scripts/externals/tooltipster.bundle.min.js", true);
+        App::instance()->tm->theme->addScript(CORE_WWW_ROOT . "ressources/scripts/tablebar.js", true);
+        App::instance()->tm->theme->addScript(CORE_WWW_ROOT . "ressources/scripts/externals/tooltipster.bundle.min.js", true);
 
         // google maps
         // // https://maps.googleapis.com/maps/api/js?key=AIzaSyCUhl24DMsrw9U02Q3hR6LGYF_6oYoqEx0
         $key = Settings::get('google_api_key');
-        if(! $key ) {
+        if (!$key) {
             Logger::debug('No Google API Key defined for maps.');
         } else {
-            App::instance()->tm->theme->addScript('//maps.googleapis.com/maps/api/js?key='.$key, true);
-            App::instance()->tm->theme->addScript($this->url()."assets/scripts/forge-events-map.js", true);
+            App::instance()->tm->theme->addScript('//maps.googleapis.com/maps/api/js?key=' . $key, true);
+            App::instance()->tm->theme->addScript($this->url() . "assets/scripts/forge-events-map.js", true);
         }
 
-        App::instance()->tm->theme->addStyle(MOD_ROOT."forge-events/assets/css/forge-events.less");
-        App::instance()->tm->theme->addStyle(CORE_WWW_ROOT."ressources/css/externals/tooltipster.bundle.min.css");
+        App::instance()->tm->theme->addStyle(MOD_ROOT . "forge-events/assets/css/forge-events.less");
+        App::instance()->tm->theme->addStyle(CORE_WWW_ROOT . "ressources/css/externals/tooltipster.bundle.min.css");
 
-        API::instance()->register('forge-events', array($this, 'apiAdapter'));
+        // register API
+        API::instance()->register('forge-events', array($this, 'apiEventsAdapter'));
+        API::instance()->register('checkin', array($this, 'apiCheckinAdapter'));
+
+        // backend navigation
+        ModifyHandler::instance()->add('modify_manage_navigation', [$this, 'modifyManageNavigation']);
     }
 
-    public function orderTableHeading($ths) {
+    public function modifyManageNavigation($navigation)
+    {
+        if(Auth::allowed($this->permission_checkin, true)) {
+            $navigation->add('checkin', i('Event checkin'), Utils::getUrl(array('manage', 'checkin')), 'leftPanel', 'exit_to_app');
+        }
+        return $navigation;
+    }
+
+    public function orderTableHeading($ths)
+    {
         $ths[] = [
             'id' => 'ticket',
             'content' => i('Ticket', 'forge-events'),
-            'class' => ''
+            'class' => '',
+            'cellAction' => ''
         ];
         return $ths;
     }
 
-    public function orderTableRow($td, $args) {
+    public function orderTableRow($td, $args)
+    {
         $td[] = [
             'id' => 'ticket',
-            'content' => '<a target="blank" href="'.Utils::getUrl(['fe-ticket-print', $args['order']]).'">'.i('Print Ticket', 'forge-events').'</a>',
-            'class' => ''
+            'content' => '<a target="blank" href="' . Utils::getUrl(['fe-ticket-print', $args['order']]) . '">' . i('Print Ticket', 'forge-events') . '</a>',
+            'class' => '',
+            'cellAction' => ''
         ];
         return $td;
     }
 
-    public function apiAdapter($data) {
+    public function apiEventsAdapter($data)
+    {
         switch ($data['query'][0]) {
             case 'participants':
                 $participants = new Participants($data['query'][1]);
-                if(Auth::allowed('manage.forge-events', true)) {
+                if (Auth::allowed('manage.forge-events', true)) {
                     $participants->isAdmin = true;
                 }
                 return $participants->handleQuery($data['query'][2]);
@@ -130,62 +156,92 @@ class ForgeEvents extends Module {
                 }
             default:
                 return false;
+
         }
     }
 
-    private function registerSettings() {
+    public function apiCheckinAdapter($data)
+    {
+        if (Auth::allowed($this->permission_checkin)) {
+            switch ($data) {
+                case 'scan':
+                    $orderId = Utils::decodeBase64($_GET['id']);
+                    $order = Payment::getOrder($orderId);
+                    switch ($order->data['status']) {
+                        case 'success':
+                            return json_encode(array("status" => 'success', 'text' => i('Erfolgreich')));
+                            break;
+                        case 'open':
+                            return json_encode(array("status" => 'unpaid', 'text' => i('Ticket nicht bezahlt')));
+                            break;
+                        case 'draft':
+                            return json_encode(array("status" => 'unpaid', 'text' => i('Ticket nicht bezahlt')));
+                            break;
+                        default:
+                            return json_encode(array("status" => 'error', 'text' => i('Fehlgeschlagen')));
+                            break;
+                    }
+                    break;
+            }
+        }
+        return null;
+    }
+
+    private function registerSettings()
+    {
         $set = Settings::instance();
         $set->registerField(
             Fields::checkbox(array(
-            'key' => 'forge-events-seatplan',
-            'label' => i('Activate Seatplan Management', 'forge-events'),
-            'hint' => i('If this checkbox is set, the seatplan management will be activated.', 'forge-events')
-        ), Settings::get('forge-events-seatplan')), 'forge-events-seatplan', 'left', 'forge-events');
+                'key' => 'forge-events-seatplan',
+                'label' => i('Activate Seatplan Management', 'forge-events'),
+                'hint' => i('If this checkbox is set, the seatplan management will be activated.', 'forge-events')
+            ), Settings::get('forge-events-seatplan')), 'forge-events-seatplan', 'left', 'forge-events');
 
         $set->registerField(
             Fields::checkbox(array(
-            'key' => 'forge-events-seatplan-locked',
-            'label' => i('Ticket seat locked after finished signup.', 'forge-events'),
-            'hint' => i('If this checkbox is set, the user won\'t be able to change its seat after completing the reservation.', 'forge-events')
-        ), Settings::get('forge-events-seatplan-locked')), 'forge-events-seatplan-locked', 'left', 'forge-events');
+                'key' => 'forge-events-seatplan-locked',
+                'label' => i('Ticket seat locked after finished signup.', 'forge-events'),
+                'hint' => i('If this checkbox is set, the user won\'t be able to change its seat after completing the reservation.', 'forge-events')
+            ), Settings::get('forge-events-seatplan-locked')), 'forge-events-seatplan-locked', 'left', 'forge-events');
 
         $set->registerField(
             Fields::text(array(
-            'key' => 'forge-events-ticket-text-below-facts',
-            'label' => i('Text below Facts', 'forge-events'),
-            'hint' => i('Text below the facts in the pdf-ticket.', 'forge-events')
-        ), Settings::get('forge-events-ticket-text-below-facts')), 'forge-events-ticket-text-below-facts', 'left', 'forge-events');
+                'key' => 'forge-events-ticket-text-below-facts',
+                'label' => i('Text below Facts', 'forge-events'),
+                'hint' => i('Text below the facts in the pdf-ticket.', 'forge-events')
+            ), Settings::get('forge-events-ticket-text-below-facts')), 'forge-events-ticket-text-below-facts', 'left', 'forge-events');
 
         $set->registerField(
             Fields::text(array(
-            'key' => 'forge-events-ticket-footer-text',
-            'label' => i('Footer Ticket Text', 'forge-events'),
-            'hint' => i('Footer Text for the pdf ticket.', 'forge-events')
-        ), Settings::get('forge-events-ticket-footer-text')), 'forge-events-ticket-footer-text', 'left', 'forge-events');
+                'key' => 'forge-events-ticket-footer-text',
+                'label' => i('Footer Ticket Text', 'forge-events'),
+                'hint' => i('Footer Text for the pdf ticket.', 'forge-events')
+            ), Settings::get('forge-events-ticket-footer-text')), 'forge-events-ticket-footer-text', 'left', 'forge-events');
     }
 
-    private function install() {
-        if(Settings::get($this->name . ".installed")) {
+    private function install()
+    {
+        if (Settings::get($this->name . ".installed")) {
             return;
         }
 
-        App::instance()->db->rawQuery('CREATE TABLE IF NOT EXISTS `forge_events_seats` ('.
-          '`id` int(11) NOT NULL,'.
-          '`event` int(11) NOT NULL,'.
-          '`x` char(2) NOT NULL,'.
-          '`y` int(11) NOT NULL,'.
-          '`type` varchar(100) NOT NULL'.
-        ') ENGINE=InnoDB DEFAULT CHARSET=utf8;');
+        App::instance()->db->rawQuery('CREATE TABLE IF NOT EXISTS `forge_events_seats` (' .
+            '`id` int(11) NOT NULL,' .
+            '`event` int(11) NOT NULL,' .
+            '`x` char(2) NOT NULL,' .
+            '`y` int(11) NOT NULL,' .
+            '`type` varchar(100) NOT NULL' .
+            ') ENGINE=InnoDB DEFAULT CHARSET=utf8;');
 
-        App::instance()->db->rawQuery('CREATE TABLE IF NOT EXISTS `forge_events_seat_reservations` ('.
-          '`id` int(11) NOT NULL,'.
-          '`user` int(11) NOT NULL,'.
-          '`x` varchar(10) NOT NULL,'.
-          '`y` int(11) NOT NULL,'.
-          '`order_id` int(11) NOT NULL,'.
-          '`event_id` int(11) NOT NULL,'.
-          '`locked` int(11) NOT NULL DEFAULT \'0\''.
-        ') ENGINE=InnoDB DEFAULT CHARSET=utf8;');
+        App::instance()->db->rawQuery('CREATE TABLE IF NOT EXISTS `forge_events_seat_reservations` (' .
+            '`id` int(11) NOT NULL,' .
+            '`user` int(11) NOT NULL,' .
+            '`x` varchar(10) NOT NULL,' .
+            '`y` int(11) NOT NULL,' .
+            '`order_id` int(11) NOT NULL,' .
+            '`event_id` int(11) NOT NULL,' .
+            '`locked` int(11) NOT NULL DEFAULT \'0\'' .
+            ') ENGINE=InnoDB DEFAULT CHARSET=utf8;');
 
         App::instance()->db->rawQuery('ALTER TABLE `forge_events_seats` ADD PRIMARY KEY (`id`);');
         App::instance()->db->rawQuery('ALTER TABLE `forge_events_seat_reservations` ADD PRIMARY KEY (`id`), ADD KEY `event_id` (`event_id`), ADD KEY `order_id` (`order_id`);');

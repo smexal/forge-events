@@ -2,11 +2,11 @@
 
 namespace Forge\Modules\ForgeEvents;
 
-use \Forge\Core\Classes\Utils;
-use \Forge\Core\Classes\User;
-use \Forge\Core\Classes\TableBar;
-use \Forge\Core\Classes\CollectionItem;
-use \Forge\Core\App\App;
+use Forge\Core\App\App;
+use Forge\Core\Classes\CollectionItem;
+use Forge\Core\Classes\TableBar;
+use Forge\Core\Classes\User;
+use Forge\Core\Classes\Utils;
 
 class Participants {
     /*
