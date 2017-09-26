@@ -99,6 +99,22 @@ class Seatplan {
         return '';
     }
 
+    public static function getSeatId($seat, $eventId) {
+        if(is_string($seat)) {
+            $seat = explode(":", $seat);
+        } else {
+            $seat = [$seat['x'], $seat['y']];
+        }
+        App::instance()->db->where('x', $seat[0]);
+        App::instance()->db->where('y', $seat[1]);
+        App::instance()->db->where('event_id', $eventId);
+        $dbSeat = App::instance()->db->getOne('forge_events_seat_reservations');
+        if(is_array($dbSeat)) {
+            return $dbSeat['id'];
+        }
+        return null;
+    }
+
     private function getAllStatus() {
         $stats = array();
         foreach($this->seatStatus as $stat) {

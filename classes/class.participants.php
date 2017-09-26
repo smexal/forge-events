@@ -67,39 +67,26 @@ class Participants {
     public function getParticipants() {
         $itm = new CollectionItem($this->eventId);
         $db = App::instance()->db;
-        $withSeatplan = true;
-        if($itm->getMeta('disable-seatplan')) {
-            $withSeatplan = false;
-            $parts = [];
-            //collection%22%3A11
-            $db->where('meta', '%collection%22%3A'.$itm->id.'%', 'LIKE');
-            $parts = $db->get('forge_payment_orders');
-        } else {
-            $db->where('event_id', $this->eventId);
-            $db->orderBy("x","asc");
-            $db->orderBy("y","asc");
-
-            $parts = $db->get('forge_events_seat_reservations');
-        }
+        $parts = [];
+        $db->where('status', 'success');
+        $db->where('meta', '%collection%22%3A'.$itm->id.'%', 'LIKE');
+        $parts = $db->get('forge_payment_orders');
         $rows = [];
+        $sp = new Seatplan($itm->id);
         foreach($parts as $part) {
             $row = new \stdClass();
-            if(! $withSeatplan) {
-                $meta = json_decode(urldecode($part['meta']));
-                foreach($meta->items as $item) {
-                    $user = new User($item->user);
-                    $row->tds = $this->getParticipantTd($user);
-                }
-            } else {
-                $user = new User($part['user']);
-                $row->tds = $this->getParticipantTd($user, $part);
+            $meta = json_decode(urldecode($part['meta']));
+            foreach($meta->items as $item) {
+                $seat = $sp->getUserSeat($item->user);
+                $user = new User($item->user);
+                $row->tds = $this->getParticipantTd($user, $seat);
             }
             $rows[] = $row;
         }
         return $rows;
     }
 
-    private function getParticipantTd($user, $part = null) {
+    private function getParticipantTd($user, $seat = null) {
         if($this->searchTerm) {
             $found = false;
             if(strstr(strtolower($user->get('username')), strtolower($this->searchTerm))) {
@@ -108,8 +95,8 @@ class Participants {
             if(strstr(strtolower($user->get('email')), strtolower($this->searchTerm))) {
                 $found = true;
             }
-            if(! is_null($part)) {
-                if(strstr(strtolower($part['x'].':'.$part['y']), strtolower($this->searchTerm))) {
+            if(! is_null($seat)) {
+                if(strstr(strtolower($seat), strtolower($this->searchTerm))) {
                     $found = true;
                 }
             }
@@ -128,11 +115,17 @@ class Participants {
         if($this->isAdmin) {
             $td[] = Utils::tableCell($user->get('email'));
         }
-        if(! is_null($part)) {
-            $td[] = Utils::tableCell($part['x'].':'.$part['y']);
-        }
+            if($seat === '') {
+                $td[] = Utils::tableCell(i('No seat selected', 'forge-events'));
+            } else {
+                $td[] = Utils::tableCell($seat);
+            }
         if($this->isAdmin) {
-            $td[] = Utils::tableCell($this->actions($part['id']));
+            if($seat === '') {
+                $td[] = Utils::tableCell(i('No seat', 'forge-events'));
+            } else {
+                $td[] = Utils::tableCell($this->actions(Seatplan::getSeatId($seat, $this->eventId)));
+            }
         }
         return $td;
     }
