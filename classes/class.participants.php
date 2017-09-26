@@ -68,20 +68,31 @@ class Participants {
         $itm = new CollectionItem($this->eventId);
         $db = App::instance()->db;
         $parts = [];
+
+        // TODO: make this unugly...
         $db->where('status', 'success');
-        $db->where('meta', '%collection%22%3A'.$itm->id.'%', 'LIKE');
+        $db->where('meta', '%collection%22%3A'.$this->eventId.'%', 'LIKE');
         $parts = $db->get('forge_payment_orders');
+
+        $db->where('status', 'success');
+        $db->where('meta', '%collection%22%3A%22'.$this->eventId.'%', 'LIKE');
+        $parts = array_merge($parts, $db->get('forge_payment_orders'));
+
+
         $rows = [];
         $sp = new Seatplan($itm->id);
+        $counter = 0;
         foreach($parts as $part) {
-            $row = new \stdClass();
             $meta = json_decode(urldecode($part['meta']));
             foreach($meta->items as $item) {
+                $counter++;
                 $seat = $sp->getUserSeat($item->user);
                 $user = new User($item->user);
+
+                $row = new \stdClass();
                 $row->tds = $this->getParticipantTd($user, $seat);
+                $rows[] = $row;
             }
-            $rows[] = $row;
         }
         return $rows;
     }
