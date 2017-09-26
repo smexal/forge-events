@@ -71,12 +71,12 @@ class Participants {
 
         // TODO: make this unugly...
         $db->where('status', 'success');
-        $db->where('meta', '%collection%22%3A'.$this->eventId.'%', 'LIKE');
+        $db->where('(meta LIKE "%collection%22%3A'.$this->eventId.'%" OR meta like "%collection%22%3A%22'.$this->eventId.'%")');
         $parts = $db->get('forge_payment_orders');
 
-        $db->where('status', 'success');
+        /*$db->where('status', 'success');
         $db->where('meta', '%collection%22%3A%22'.$this->eventId.'%', 'LIKE');
-        $parts = array_merge($parts, $db->get('forge_payment_orders'));
+        $parts = array_merge($parts, $db->get('forge_payment_orders'));*/
 
 
         $rows = [];
