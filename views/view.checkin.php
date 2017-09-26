@@ -17,8 +17,8 @@ class CheckinView extends View
     {
         if (Auth::allowed($this->permission)) {
             return $this->app->render(MOD_ROOT . 'forge-events/templates/', "checkin", array(
-                'title' => i('Checkin / QR Code scanning'),
-                'button_text' => i('Neuer Scan')
+                'title' => i('Checkin / QR Code scanning', 'forge-events'),
+                'button_text' => i('New Scan', 'forge-events')
             ));
         }
     }
