@@ -16,6 +16,7 @@ use \Forge\Core\Classes\CollectionItem;
 class EventCollection extends DataCollection {
     public $permission = "manage.collection.sites";
     private $itemId = null;
+    private $item = null;
 
     protected function setup() {
         $this->preferences['name'] = 'forge-events';
@@ -30,6 +31,7 @@ class EventCollection extends DataCollection {
     }
 
     public function render($item) {
+        $this->item = $item;
 
         if($item->getMeta('hide-detail')) {
             App::instance()->redirect('404');
@@ -88,8 +90,31 @@ class EventCollection extends DataCollection {
     }
 
     public function customEditContent($id) {
-        $this->itemId = $id;
-        $colItem = new CollectionItem($id);
+    }
+
+    public function getSubnavigation() {
+        $base = [
+            [
+            'url' => 'participants',
+            'title' => i('Participants', 'forge-events')
+            ],
+        ];
+        $seatplan = null;
+        if(Settings::get('forge-events-seatplan')) {
+            $seatplan = [
+                [
+                    'url' => 'seatplan',
+                    'title' => i('Seatplan', 'forge-events')
+                ]
+            ];
+        }
+        
+        return array_merge($base, $seatplan);
+    }
+
+    public function subviewSeatplan($itemId) {
+        $this->itemId = $itemId;
+        $colItem = new CollectionItem($itemId);
 
         $return = '';
         if(Settings::get('forge-events-seatplan') && $colItem->getMeta('disable-seatplan') != 'on') {
@@ -99,14 +124,8 @@ class EventCollection extends DataCollection {
         return $return;
     }
 
-    public function getSubnavigation() {
-        return [
-            [
-            'url' => 'participants',
-            'title' => i('Participants', 'forge-events')
-            ]
-        ];
-
+    public function subviewSeatplanActions() {
+        return;
     }
 
     public function subviewParticipants($itemId) {

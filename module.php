@@ -15,13 +15,11 @@ use Forge\Loader;
 use Forge\Modules\ForgePayment\Payment;
 
 
-class ForgeEvents extends Module
-{
+class ForgeEvents extends Module {
     private $permission = 'manage.forge-events';
     private $permission_checkin = 'manage.checkin';
 
-    public function setup()
-    {
+    public function setup() {
         $this->version = '0.1.0';
         $this->id = "forge-events";
         $this->name = i('Event Management', 'forge-events');
@@ -29,8 +27,7 @@ class ForgeEvents extends Module
         $this->image = $this->url() . 'assets/images/module-image.png';
     }
 
-    public function start()
-    {
+    public function start() {
         $this->install();
         $this->registerSettings();
 
@@ -69,9 +66,9 @@ class ForgeEvents extends Module
         // backend
         Loader::instance()->addStyle("modules/forge-events/assets/css/forge-events.less");
         Loader::instance()->addScript("modules/forge-events/assets/scripts/forge-events.js");
-        Loader::instance()->addScript("modules/forge-events/assets/scripts/instascan.min.js");
-        Loader::instance()->addScript("modules/forge-events/assets/scripts/forge-checkin.js");
-        Loader::instance()->addStyle("modules/forge-events/assets/css/forge-checkin.less");
+        //Loader::instance()->addScript("modules/forge-events/assets/scripts/instascan.min.js");
+        //Loader::instance()->addScript("modules/forge-events/assets/scripts/forge-checkin.js");
+        //Loader::instance()->addStyle("modules/forge-events/assets/css/forge-checkin.less");
 
         // frontend
         App::instance()->tm->theme->addScript($this->url() . "assets/scripts/forge-events.js", true);
@@ -100,16 +97,14 @@ class ForgeEvents extends Module
         ModifyHandler::instance()->add('modify_manage_navigation', [$this, 'modifyManageNavigation']);
     }
 
-    public function modifyManageNavigation($navigation)
-    {
+    public function modifyManageNavigation($navigation) {
         if(Auth::allowed($this->permission_checkin, true)) {
             $navigation->add('checkin', i('Event checkin'), Utils::getUrl(array('manage', 'checkin')), 'leftPanel', 'exit_to_app');
         }
         return $navigation;
     }
 
-    public function orderTableHeading($ths)
-    {
+    public function orderTableHeading($ths) {
         $ths[] = [
             'id' => 'ticket',
             'content' => i('Ticket', 'forge-events'),
@@ -119,8 +114,7 @@ class ForgeEvents extends Module
         return $ths;
     }
 
-    public function orderTableRow($td, $args)
-    {
+    public function orderTableRow($td, $args) {
         $td[] = [
             'id' => 'ticket',
             'content' => '<a target="blank" href="' . Utils::getUrl(['fe-ticket-print', $args['order']]) . '">' . i('Print Ticket', 'forge-events') . '</a>',
@@ -130,8 +124,7 @@ class ForgeEvents extends Module
         return $td;
     }
 
-    public function apiEventsAdapter($data)
-    {
+    public function apiEventsAdapter($data) {
         switch ($data['query'][0]) {
             case 'participants':
                 $participants = new Participants($data['query'][1]);
@@ -160,8 +153,7 @@ class ForgeEvents extends Module
         }
     }
 
-    public function apiCheckinAdapter($data)
-    {
+    public function apiCheckinAdapter($data) {
         if (Auth::allowed($this->permission_checkin)) {
             switch ($data) {
                 case 'scan':
@@ -187,8 +179,7 @@ class ForgeEvents extends Module
         return null;
     }
 
-    private function registerSettings()
-    {
+    private function registerSettings() {
         $set = Settings::instance();
         $set->registerField(
             Fields::checkbox(array(
@@ -219,8 +210,7 @@ class ForgeEvents extends Module
             ), Settings::get('forge-events-ticket-footer-text')), 'forge-events-ticket-footer-text', 'left', 'forge-events');
     }
 
-    private function install()
-    {
+    private function install() {
         if (Settings::get($this->name . ".installed")) {
             return;
         }
