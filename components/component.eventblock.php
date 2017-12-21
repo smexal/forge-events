@@ -2,9 +2,10 @@
 
 namespace Forge\Modules\ForgeEvents;
 
-use \Forge\Core\Classes\CollectionItem;
+use \Forge\Core\Classes\Utils;
 use \Forge\Core\Abstracts\Component;
 use \Forge\Core\App\App;
+use \Forge\Core\Classes\CollectionItem;
 
 class EventblockComponent extends Component {
     public $settings = [];
@@ -26,6 +27,26 @@ class EventblockComponent extends Component {
                 'hint' => i('Title the block', 'forge-events'),
                 'key' => $this->prefix.'title',
                 'type' => 'text'
+            ],
+            [
+                'label' => i('Primary CTA Title', 'forge-events'),
+                'key' => $this->prefix.'prim_cta_title',
+                'type' => 'text'
+            ],
+            [
+                'label' => i('Primary CTA URL', 'forge-events'),
+                'key' => $this->prefix.'prim_cta_url',
+                'type' => 'url'
+            ],
+            [
+                'label' => i('Secondary CTA Title', 'forge-events'),
+                'key' => $this->prefix.'secondary_cta_title',
+                'type' => 'text'
+            ],
+            [
+                'label' => i('Secondary CTA URL', 'forge-events'),
+                'key' => $this->prefix.'secondary_cta_url',
+                'type' => 'url'
             ]
         ];
         return [
@@ -61,7 +82,19 @@ class EventblockComponent extends Component {
 
         return App::instance()->render(DOC_ROOT.'modules/forge-events/templates/', "event-block", [
             'title' => $item->getMeta('title'),
-            'blocktitle' => $this->getField($this->prefix.'title')
+            'blocktitle' => $this->getField($this->prefix.'title'),
+            'lead' => $item->getMeta('description'),
+            'text' => $item->getMeta('text'),
+            'when_label' => i('When?', 'allocate'),
+            'when_value' => Utils::dateFormat($item->getMeta('start-date'), true),
+            'where_label' => i('Where?', 'allocate'),
+            'where_value' => $item->getMeta('address'),
+            'price_label' => i('How much?', 'allocate'),
+            'price_value' => Utils::formatAmount($item->getMeta('price'), true),
+            'prim_cta_title' => $this->getField($this->prefix.'prim_cta_title'),
+            'prim_cta_url' => $this->getField($this->prefix.'prim_cta_url'),
+            'secondary_cta_title' => $this->getField($this->prefix.'secondary_cta_title'),
+            'secondary_cta_url' => $this->getField($this->prefix.'secondary_cta_url')
         ]);
     }
 }
