@@ -80,6 +80,11 @@ class EventblockComponent extends Component {
         $collection = App::instance()->cm->getCollection('forge-events');
         $item = new CollectionItem($eventId);
 
+        $max = $collection->getEventMaximumAmount($eventId);
+        $sold = $collection->getEventSoldAmount($eventId);
+        $percent = 100 / $max * $sold;
+        $remaining = $max - $sold;
+
         return App::instance()->render(DOC_ROOT.'modules/forge-events/templates/', "event-block", [
             'title' => $item->getMeta('title'),
             'blocktitle' => $this->getField($this->prefix.'title'),
@@ -94,7 +99,9 @@ class EventblockComponent extends Component {
             'prim_cta_title' => $this->getField($this->prefix.'prim_cta_title'),
             'prim_cta_url' => $this->getField($this->prefix.'prim_cta_url'),
             'secondary_cta_title' => $this->getField($this->prefix.'secondary_cta_title'),
-            'secondary_cta_url' => $this->getField($this->prefix.'secondary_cta_url')
+            'secondary_cta_url' => $this->getField($this->prefix.'secondary_cta_url'),
+            'progress_amount' => $percent,
+            'remaining_seats' => sprintf(i('%1$s available tickets', 'forge-events'), $remaining), 
         ]);
     }
 }

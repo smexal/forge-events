@@ -5,9 +5,16 @@
                 <p class="discreet">{$blocktitle}</p>
                 <h2>{$title}</h2>
             </div>
+            <div class="col-lg-6 remaining">
+                <span class="cta-light">{$remaining_seats}</span>
+            </div>
         </div>
-        <div class="row">
-            <div class="col-lg-12">PROGRESS</div>
+        <div class="row forge-progress">
+            <div class="col-lg-12">
+                <div class="bar-bg">
+                    <div class="bar" style="width: {$progress_amount}%;"></div>
+                </div>
+            </div>
         </div>
         <div class="row">
             <div class="col-lg-7">
@@ -26,4 +33,5 @@
                 <div class="fact"><p class="discreet">{$price_label}</p><h3>{$price_value}</h3></div>
             </div>
         </div>
+    </div>
 </div>
