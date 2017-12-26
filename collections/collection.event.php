@@ -6,10 +6,10 @@ use Forge\Core\Classes\Settings;
 use \Forge\Core\Abstracts\DataCollection;
 use \Forge\Core\App\App;
 use \Forge\Core\App\Auth;
+use \Forge\Core\Classes\CollectionItem;
+use \Forge\Core\Classes\Media;
 use \Forge\Core\Classes\User;
 use \Forge\Core\Classes\Utils;
-use \Forge\Core\Classes\Media;
-use \Forge\Core\Classes\CollectionItem;
 
 
 
@@ -28,6 +28,10 @@ class EventCollection extends DataCollection {
         $this->preferences['has_password'] = true;
 
         $this->custom_fields();
+    }
+
+    public function test($item) {
+        return 'yea';
     }
 
     public function render($item) {
@@ -60,7 +64,9 @@ class EventCollection extends DataCollection {
             $buttonText = i('Sold out', 'forge-events');
         }
 
-        return App::instance()->render(MOD_ROOT.'forge-events/templates/', 'event-detail', [
+        $navigation = $this->renderSubnavigation();
+
+        return $navigation.App::instance()->render(MOD_ROOT.'forge-events/templates/', 'event-detail', [
             'header_image' => $header_image ? $header_image->getUrl() : false,
             'title' => $item->getMeta('title'),
             'lead' => $item->getMeta('description'),
@@ -87,6 +93,32 @@ class EventCollection extends DataCollection {
             'additional' => $item->getMeta('additional-info'),
             'additional_label' => i('Additional Information', 'forge-events')
         ]);
+    }
+
+    private function renderSubnavigation($view = 'default') {
+        return App::instance()->render(MOD_ROOT.'forge-events/templates/parts', 'event-detail-navigation', [
+            'items' => [
+                [
+                    'url' => $this->item->url(),
+                    'title' => i('General', 'forge-events'),
+                    'active' => $view == 'default' ? 'active' : ''
+                ], 
+                [
+                    'url' => $this->item->url().'/participants',
+                    'title' => i('Participants', 'forge-events'),
+                    'active' => $view == 'participants' ? 'active' : ''
+                ]
+            ]
+        ]);
+    }
+
+    public function participants($item) {
+        $this->item = $item;
+        $return = '';
+
+        $return.= $this->renderSubnavigation('participants');
+
+        return $return;
     }
 
     public function customEditContent($id) {

@@ -1,0 +1,11 @@
+<div class="subnavigation">
+    <div class="wrapper">
+        <nav>
+            <ul>
+                {loop="$items"}
+                <li class="{$value.active}"><a href="{$value.url}">{$value.title}</a></li>
+                {/loop}
+            </ul>
+        </nav>
+    </div>
+</div>
