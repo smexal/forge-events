@@ -88,6 +88,7 @@ class ForgeEvents extends Module {
 
         App::instance()->tm->theme->addStyle(MOD_ROOT . "forge-events/assets/css/forge-events.less");
         App::instance()->tm->theme->addStyle(MOD_ROOT . "forge-events/assets/css/event-block.less");
+        App::instance()->tm->theme->addStyle(MOD_ROOT . "forge-events/assets/css/fe-event-detail.less");
         App::instance()->tm->theme->addStyle(CORE_WWW_ROOT . "ressources/css/externals/tooltipster.bundle.min.css");
 
         // register API

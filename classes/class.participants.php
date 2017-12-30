@@ -64,7 +64,7 @@ class Participants {
         return $ths;
     }
 
-    public function getParticipants() {
+    public function getAll() {
         $itm = new CollectionItem($this->eventId);
         $db = App::instance()->db;
         $parts = [];
@@ -78,6 +78,42 @@ class Participants {
         $db->where('meta', '%collection%22%3A%22'.$this->eventId.'%', 'LIKE');
         $parts = array_merge($parts, $db->get('forge_payment_orders'));*/
 
+        $participants = [];
+        $sp = new Seatplan($itm->id);
+        $counter = 0;
+        foreach($parts as $part) {
+            $meta = json_decode(urldecode($part['meta']));
+            foreach($meta->items as $item) {
+                $counter++;
+                $seat = $sp->getUserSeat($item->user);
+                $user = new User($item->user);
+                $participants[] = [
+                    'user' => [
+                        'id' => $user->get('id'),
+                        'username' => $user->get('username'),
+                        'email' => $user->get('email'),
+                        'avatar' => $user->getAvatar() !== null ? $user->getAvatar() : false
+                    ],
+                    'seat' => $seat
+                ];
+            }
+        }
+        return $participants;
+    }
+
+    public function getParticipants() {
+        $itm = new CollectionItem($this->eventId);
+        $db = App::instance()->db;
+        $parts = [];
+
+        // TODO: make this unugly...
+        $db->where('status', 'success');
+        $db->where('(meta LIKE "%collection%22%3A'.$this->eventId.'%" OR meta like "%collection%22%3A%22'.$this->eventId.'%")');
+        $parts = $db->get('forge_payment_orders');
+
+        /*$db->where('status', 'success');
+        $db->where('meta', '%collection%22%3A%22'.$this->eventId.'%', 'LIKE');
+        $parts = array_merge($parts, $db->get('forge_payment_orders'));*/
 
         $rows = [];
         $sp = new Seatplan($itm->id);

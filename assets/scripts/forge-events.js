@@ -1,6 +1,36 @@
 var forgeEvents = {
     init : function() {
         forgeEvents.seatPlan();
+        forgeEvents.searchParticipants();
+    },
+
+    searchParticipants : function() {
+        var timeout = false;
+        $("input#searchParticipants").on('input', function() {
+            clearTimeout(timeout);
+            var searchString = $(this).val();
+            timeout = setTimeout(function() {
+                $(".seatplan").find(".cell").each(function() {
+                    if(searchString.length > 0 && 
+                        typeof($(this).attr('data-cell-user')) == 'string' 
+                        && $(this).attr('data-cell-user').indexOf(searchString) >= 0 ) {
+                        $(this).addClass('highlight');
+                    } else {
+                        $(this).removeClass('highlight');
+                    }
+                });
+
+                $("#participants .compact-infobox").each(function() {
+                    if( $(this).find("h4").text().indexOf(searchString) >= 0 &&
+                        searchString.length > 0) {
+                        $(this).addClass('highlight');
+                    } else {
+                        $(this).removeClass('highlight');
+                    }
+                });
+
+            }, 400);
+        });
     },
 
     seatPlan : function() {

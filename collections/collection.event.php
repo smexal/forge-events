@@ -2,6 +2,8 @@
 
 namespace Forge\Modules\ForgeEvents;
 
+use Forge\Core\Classes\Builder;
+use Forge\Core\Classes\Localization;
 use Forge\Core\Classes\Settings;
 use \Forge\Core\Abstracts\DataCollection;
 use \Forge\Core\App\App;
@@ -45,18 +47,6 @@ class EventCollection extends DataCollection {
             $header_image = new Media($header_image);
         }
 
-        $participants = new Participants($item->id);
-        if(Auth::allowed('manage.forge-events', true)) {
-            $participants->isAdmin = true;
-        }
-        $participantsTable = $participants->renderTable();
-        if($item->getMeta('disable-seatplan') == 'on') {
-            $seatplan = false;
-        } else {
-            $seatplan = new Seatplan($item->id, true);
-            $seatplan->actions = false;
-        }
-
         $ticketsAvailable = $this->getEventMaximumAmount($item->id) > $this->getEventSoldAmount($item->id);
 
         $buttonText = i('Signup now', 'forge-events');
@@ -66,7 +56,20 @@ class EventCollection extends DataCollection {
 
         $navigation = $this->renderSubnavigation();
 
+        $max = $this->getEventMaximumAmount($item->id);
+        $sold = $this->getEventSoldAmount($item->id);
+        $percent = 100 / $max * $sold;
+
+        $builder = new Builder('collection', $item->id, 'defaultEventBuilder');
+        $elements = $builder->getBuilderElements(Localization::getCurrentLanguage());
+
+        $builderContent = '';
+        foreach($elements as $element) {
+            $builderContent.=$element->content();
+        }
+
         return $navigation.App::instance()->render(MOD_ROOT.'forge-events/templates/', 'event-detail', [
+            'progress_amount' => $percent,
             'header_image' => $header_image ? $header_image->getUrl() : false,
             'title' => $item->getMeta('title'),
             'lead' => $item->getMeta('description'),
@@ -86,12 +89,11 @@ class EventCollection extends DataCollection {
             'signup_url' => $ticketsAvailable ? Utils::url(['event-signup', $item->slug()]) : '#',
             'location_info_label' => i('Location', 'forge-events'),
             'location_info' => $item->getMeta('location-info'),
-            'participantsTable' => $participantsTable,
             'participants_label' => i('Participants', 'forge-events'),
             'seatplan_label' => i('Seatplan', 'forge-events'),
-            'seatplan' => $seatplan ? $seatplan->draw() : false,
             'additional' => $item->getMeta('additional-info'),
-            'additional_label' => i('Additional Information', 'forge-events')
+            'additional_label' => i('Additional Information', 'forge-events'),
+            'builderContent' => $builderContent
         ]);
     }
 
@@ -116,12 +118,31 @@ class EventCollection extends DataCollection {
         $this->item = $item;
         $return = '';
 
+        if($item->getMeta('disable-seatplan') == 'on') {
+            $seatplan = false;
+        } else {
+            $seatplan = new Seatplan($item->id, true);
+            $seatplan->actions = false;
+        }
+
+        $participants = new Participants($item->id);
+        $people = $participants->getAll();
+
         $return.= $this->renderSubnavigation('participants');
+        $return.= App::instance()->render(MOD_ROOT.'forge-events/templates/parts/', 'event-detail-participants', [
+            'participants_title' => i('Participants', 'forge-events'),
+            'seatplan' => $seatplan ? $seatplan->draw() : false,
+            'participants' => $people,
+            'noSeat' => $seatplan ? i('No Seat selected', 'forge-events') : '',
+            'searchLabel' => i('Search Particpant', 'forge-events')
+        ]);
 
         return $return;
     }
 
     public function customEditContent($id) {
+        $builder = new Builder('collection', $id, 'defaultEventBuilder');
+        return $builder->render();
     }
 
     public function getSubnavigation() {

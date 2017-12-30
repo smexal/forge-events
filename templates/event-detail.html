@@ -3,8 +3,18 @@
         <div class="row">
             <div class="col-lg-12">
                 <h1>{$title}</h1>
+                {if="$signup"}
+                <div class="signup">
+                    <a href="{$signup_url}" class="btn btn-primary">{$signup_text}</a>
+                </div>
+                {/if}
             </div>
         </div>
+    </div>
+</div>
+<div class="forge-progress">
+    <div class="bar-bg">
+        <div class="bar" style="width: {$progress_amount}%;"></div>
     </div>
 </div>
 <div class="intro-infos">
@@ -34,17 +44,15 @@
                     <span class="before">{$price_label}</span>
                     <span class="main">{$price}</span>
                 </div>
-                {if="$signup"}
-                <div class="signup">
-                    <div class="wrapped">
-                        <a href="{$signup_url}" class="btn btn-primary">{$signup_text}</a>
-                    </div>
-                </div>
-                {/if}
             </div>
         </div>
     </div>
 </div>
+
+<div class="builder-content">
+    {$builderContent}
+</div>
+
 <div class="additional-information">
     <div class="wrapped">
         <div class="row">
@@ -58,11 +66,6 @@
                     <li class="">
                         <a data-toggle="tab" href="#participants">{$participants_label}</a>
                     </li>
-                    {if="$seatplan"}
-                    <li class="">
-                        <a data-toggle="tab" href="#seatplan">{$seatplan_label}</a>
-                    </li>
-                    {/if}
                     {if="$additional"}
                     <li class="">
                         <a data-toggle="tab" href="#additional">{$additional_label}</a>
@@ -70,22 +73,6 @@
                     {/if}
                 </ul>
                 <div class="tab-content">
-                    <!-- Participants -->
-                    <div id="participants" class="tab-pane fade in">
-                        <div class="row">
-                            {$participantsTable}
-                        </div>
-                    </div>
-
-                    {if="$seatplan"}
-                    <!-- Seatplan -->
-                    <div id="seatplan" class="tab-pane fade in">
-                        <div class="row">
-                            {$seatplan}
-                        </div>
-                    </div>
-                    {/if}
-
                     {if="$additional"}
                     <!-- Seatplan -->
                     <div id="additional" class="tab-pane fade in">

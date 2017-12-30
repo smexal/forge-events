@@ -162,14 +162,16 @@ class Seatplan {
                 if($status == 'spacer' || $status == 'undefined') {
                     $columns[$name] = array(
                         'status' => $status,
-                        'tipurl' => false,
-                        'mine' => false
+                        'tooltip' => false,
+                        'user' => false
                     );
                 } else {
+                    $seatInfo = $this->getSeatInfo($name, $no, $status);
                     $columns[$name] = array(
                         'status' => $status,
-                        'mine' => $this->isUserSeat($name, $count),
-                        'tipurl' => Utils::getUrl(array(
+                        'tooltip' => $seatInfo['tooltip'],
+                        'user' => $seatInfo['user']
+                        /*'tipurl' => Utils::getUrl(array(
                             "api",
                             "forge-events",
                             "seatplan",
@@ -177,7 +179,7 @@ class Seatplan {
                             $this->event,
                             $name,
                             $no
-                        ))
+                        ))*/
                     );
                 }
             }
@@ -207,7 +209,7 @@ class Seatplan {
         return false;
     }
 
-    private function getTooltip($name, $no, $status = false) {
+    private function getSeatInfo($name, $no, $status = false) {
         if(!$status) {
             $status = $this->getSeatStatus($name, $no);
         }
@@ -218,10 +220,15 @@ class Seatplan {
         if($status == 'sold') {
             $user = $this->getSoldUser($name, $no);
         }
+        $username = false;
         if($user) {
             $status = sprintf(i('Sold to %s', 'forge-events'), $user->get('username'));
+            $username = $user->get('username');
         }
-        return $name.':'.$no.' - '.i($status);
+        return [
+            'tooltip' => $name.':'.$no.' - '.i($status),
+            'user' => $username
+        ];
     }
 
     public function getSoldUser($x, $y) {
@@ -264,7 +271,7 @@ class Seatplan {
             case 'seatstatus':
                 $x = $query[2];
                 $y = $query[3];
-                return json_encode( array("content" => $this->getTooltip($x, $y)) );
+                return json_encode( array("content" => $this->getSeatInfo($x, $y)) );
             default:
                 return;
         }
