@@ -32,10 +32,6 @@ class EventCollection extends DataCollection {
         $this->custom_fields();
     }
 
-    public function test($item) {
-        return 'yea';
-    }
-
     public function render($item) {
         $this->item = $item;
 
@@ -82,36 +78,96 @@ class EventCollection extends DataCollection {
             'price' => Utils::formatAmount($item->getMeta('price'), true),
             'participants_amount_label' => i('Amount of participants', 'forge-events'),
             'participants_amount' => $this->getEventMaximumAmount($item->id),
-            'end_date' => $item->getMeta('end-date'),
             'address' => $item->getMeta('address'),
             'signup' => $item->getMeta('allow-signup'),
             'signup_text' => $buttonText,
             'signup_url' => $ticketsAvailable ? Utils::url(['event-signup', $item->slug()]) : '#',
-            'location_info_label' => i('Location', 'forge-events'),
-            'location_info' => $item->getMeta('location-info'),
-            'participants_label' => i('Participants', 'forge-events'),
-            'seatplan_label' => i('Seatplan', 'forge-events'),
-            'additional' => $item->getMeta('additional-info'),
-            'additional_label' => i('Additional Information', 'forge-events'),
             'builderContent' => $builderContent
         ]);
     }
 
     private function renderSubnavigation($view = 'default') {
-        return App::instance()->render(MOD_ROOT.'forge-events/templates/parts', 'event-detail-navigation', [
-            'items' => [
-                [
-                    'url' => $this->item->url(),
-                    'title' => i('General', 'forge-events'),
-                    'active' => $view == 'default' ? 'active' : ''
-                ], 
-                [
-                    'url' => $this->item->url().'/participants',
-                    'title' => i('Participants', 'forge-events'),
-                    'active' => $view == 'participants' ? 'active' : ''
-                ]
+        
+        $items = [
+            [
+                'url' => $this->item->url(),
+                'title' => i('General', 'forge-events'),
+                'active' => $view == 'default' ? 'active' : ''
+            ], 
+            [
+                'url' => $this->item->url().'/participants',
+                'title' => i('Participants', 'forge-events'),
+                'active' => $view == 'participants' ? 'active' : ''
             ]
+        ];
+
+        $builder = new Builder('collection', $this->item->id, 'tournamentsEventBuilder');
+        $tournamentElements = $builder->getBuilderElements(Localization::getCurrentLanguage());
+
+        if(count($tournamentElements) > 0) {
+            $items = array_merge($items, [
+                [
+                    'url' => $this->item->url().'/tournaments',
+                    'title' => i('Tournaments', 'forge-events'),
+                    'active' => $view == 'tournaments' ? 'active' : ''
+                ]
+            ]);
+        }        
+
+        $builder = new Builder('collection', $this->item->id, 'moreEventBuilder');
+        $elements = $builder->getBuilderElements(Localization::getCurrentLanguage());
+
+        if(count($elements) > 0) {
+            $items = array_merge($items, [
+                [
+                    'url' => $this->item->url().'/more',
+                    'title' => i('More Information', 'forge-events'),
+                    'active' => $view == 'more' ? 'active' : ''
+                ]
+            ]);
+        }
+
+        return App::instance()->render(MOD_ROOT.'forge-events/templates/parts', 'event-detail-navigation', [
+            'items' => $items
         ]);
+    }
+
+    public function tournaments($item) {
+        $this->item = $item;
+        $return = '';
+
+        $return.= $this->renderSubnavigation('tournaments');
+
+        $builder = new Builder('collection', $this->item->id, 'tournamentsEventBuilder');
+        $elements = $builder->getBuilderElements(Localization::getCurrentLanguage());
+
+        $builderContent = '';
+        foreach($elements as $element) {
+            $builderContent.=$element->content();
+        }
+
+        $return.= $builderContent;
+
+        return $return;
+    }
+
+    public function more($item) {
+        $this->item = $item;
+        $return = '';
+
+        $return.= $this->renderSubnavigation('more');
+
+        $builder = new Builder('collection', $this->item->id, 'moreEventBuilder');
+        $elements = $builder->getBuilderElements(Localization::getCurrentLanguage());
+
+        $builderContent = '';
+        foreach($elements as $element) {
+            $builderContent.=$element->content();
+        }
+
+        $return.= $builderContent;
+
+        return $return;
     }
 
     public function participants($item) {
@@ -148,10 +204,19 @@ class EventCollection extends DataCollection {
     public function getSubnavigation() {
         $base = [
             [
-            'url' => 'participants',
-            'title' => i('Participants', 'forge-events')
+                'url' => 'participants',
+                'title' => i('Participants', 'forge-events')
             ],
+            [
+                'url' => 'tournaments',
+                'title' => i('Tournaments', 'forge-events')
+            ],
+            [
+                'url' => 'more',
+                'title' => i('More Information', 'forge-events')
+            ]
         ];
+
         $seatplan = null;
         if(Settings::get('forge-events-seatplan')) {
             $seatplan = [
@@ -163,6 +228,24 @@ class EventCollection extends DataCollection {
         }
         
         return array_merge($base, $seatplan);
+    }
+
+    public function subviewTournaments($itemId) {
+        $builder = new Builder('collection', $itemId, 'tournamentsEventBuilder');
+        return $builder->render();
+    }
+
+    public function subviewTournamentsActions() {
+        return;
+    }
+
+    public function subviewMore($itemId) {
+        $builder = new Builder('collection', $itemId, 'moreEventBuilder');
+        return $builder->render();
+    }
+
+    public function subviewMoreActions() {
+        return;
     }
 
     public function subviewSeatplan($itemId) {
@@ -294,7 +377,7 @@ class EventCollection extends DataCollection {
         $this->addFields(
             array_merge(
                 [
-                    array(
+                    array (
                         'key' => 'amount-of-participants',
                         'label' => i('Number of participants', 'forge-events'),
                         'multilang' => true,
@@ -303,7 +386,7 @@ class EventCollection extends DataCollection {
                         'position' => 'right',
                         'hint' => ''
                     ),
-                    array(
+                    array (
                         'key' => 'allow-signup',
                         'label' => i('Allow Event Signups', 'forge-events'),
                         'multilang' => false,
@@ -312,7 +395,7 @@ class EventCollection extends DataCollection {
                         'position' => 'right',
                         'hint' => ''
                     ),
-                    array(
+                    array (
                         'key' => 'hide-detail',
                         'label' => i('Hide Detail', 'forge-events'),
                         'multilang' => true,
@@ -321,7 +404,7 @@ class EventCollection extends DataCollection {
                         'position' => 'right',
                         'hint' => i('If this checkbox is active, people will not be able to check the detail page.', 'forge-events')
                     ),
-                    array(
+                    array (
                         'key' => 'start-date',
                         'label' => i('Start Date', 'forge-events'),
                         'multilang' => true,
@@ -330,7 +413,7 @@ class EventCollection extends DataCollection {
                         'position' => 'right',
                         'hint' => ''
                     ),
-                    array(
+                    array (
                         'key' => 'end-date',
                         'label' => i('End Date', 'forge-events'),
                         'multilang' => true,
@@ -339,7 +422,7 @@ class EventCollection extends DataCollection {
                         'position' => 'right',
                         'hint' => ''
                     ),
-                    array(
+                    array (
                         'key' => 'price',
                         'label' => i('Event Price', 'forge-events'),
                         'multilang' => true,
@@ -348,7 +431,7 @@ class EventCollection extends DataCollection {
                         'position' => 'right',
                         'hint' => ''
                     ),
-                    array(
+                    array (
                         'key' => 'address',
                         'label' => i('Address', 'forge-events'),
                         'multilang' => true,
@@ -357,7 +440,7 @@ class EventCollection extends DataCollection {
                         'position' => 'right',
                         'hint' => ''
                     ),
-                    array(
+                    array (
                         'key' => 'text',
                         'label' => i('Text', 'forge-events'),
                         'multilang' => true,
@@ -366,7 +449,7 @@ class EventCollection extends DataCollection {
                         'position' => 'left',
                         'hint' => ''
                     ),
-                    array(
+                    array (
                         'key' => 'minimum_amount',
                         'label' => i('Minimum Amount of Tickets per Buy', 'forge-events'),
                         'multilang' => false,
@@ -375,7 +458,7 @@ class EventCollection extends DataCollection {
                         'position' => 'right',
                         'hint' => ''
                     ),
-                    array(
+                    array (
                         'key' => 'header_image',
                         'label' => i('Header Image', 'forge-events'),
                         'multilang' => false,
@@ -383,20 +466,6 @@ class EventCollection extends DataCollection {
                         'order' => 40,
                         'position' => 'right',
                         'hint' => ''
-                    ),
-                    array (
-                        'key' => 'location-info',
-                        'label' => i('Location Informations', 'forge-events'),
-                        'type' => 'wysiwyg',
-                        'order' => 80,
-                        'position' => 'left'
-                    ),
-                    array (
-                        'key' => 'additional-info',
-                        'label' => i('Additional Informations', 'forge-events'),
-                        'type' => 'wysiwyg',
-                        'order' => 90,
-                        'position' => 'left'
                     ),
                     array (
                         'key' => 'disable-seatplan',

@@ -51,7 +51,7 @@ class EventblockComponent extends Component {
         ];
         return [
             'name' => i('Event Teaser Block'),
-            'description' => i('Event Teaser Block with some Event-Information.', 'forge-events'),
+            'description' => i('Block with Event-Information.', 'forge-events'),
             'id' => 'forge_events_eblock',
             'image' => '',
             'level' => 'inner',

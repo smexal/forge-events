@@ -9,20 +9,24 @@ var forgeEvents = {
         $("input#searchParticipants").on('input', function() {
             clearTimeout(timeout);
             var searchString = $(this).val();
+            searchString = searchString.toLowerCase();
+            $(".seatplan").removeClass('searchActive');
             timeout = setTimeout(function() {
                 $(".seatplan").find(".cell").each(function() {
                     if(searchString.length > 0 && 
                         typeof($(this).attr('data-cell-user')) == 'string' 
-                        && $(this).attr('data-cell-user').indexOf(searchString) >= 0 ) {
+                        && $(this).attr('data-cell-user').toLowerCase().indexOf(searchString) >= 0 ) {
                         $(this).addClass('highlight');
+                        $(this).closest('.seatplan').addClass('searchActive');
                     } else {
                         $(this).removeClass('highlight');
                     }
                 });
 
                 $("#participants .compact-infobox").each(function() {
-                    if( $(this).find("h4").text().indexOf(searchString) >= 0 &&
+                    if( $(this).find("h4").text().toLowerCase().indexOf(searchString) >= 0 &&
                         searchString.length > 0) {
+                        $(this).closest('.seatplan').addClass('searchActive');
                         $(this).addClass('highlight');
                     } else {
                         $(this).removeClass('highlight');
