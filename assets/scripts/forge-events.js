@@ -78,7 +78,7 @@ var forgeEvents = {
                             plan.remove();
                             parent.append(data.plan);
                             $(document).trigger("ajaxReload");
-                        })
+                        });
                     });
                 });
             })
