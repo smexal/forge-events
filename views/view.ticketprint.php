@@ -29,9 +29,20 @@ class TicketprintView extends View {
         }
 
         $order = Payment::getOrder($parts[0]);
+        $isOwner = false;
         if($order->data['user'] !== App::instance()->user->get('id')) {
-            echo 'false';
-            exit();
+            $isPartOwner = false;
+            foreach($order->data['paymentMeta']->{'items'} as $item) {
+                if(App::instance()->user->get('id') == $item->user) {
+                    $isPartOwner = true;
+                }
+            }
+            if(! $isPartOwner) {
+                echo 'nope dope..';
+                exit();
+            }
+        } else {
+            $isOwner = true;
         }
         if($order->data['status'] !== 'success') {
             echo 'nope';
@@ -47,7 +58,13 @@ class TicketprintView extends View {
 
         $orderMeta = json_decode( $order->data['meta'] );
         foreach($orderMeta->items as $item) {
-            $this->addTicketPage($item, $order);
+            if($isOwner) {
+                $this->addTicketPage($item, $order);
+            } else {
+                if($item->user == App::instance()->user->get('id')) {
+                    $this->addTicketPage($item, $order);
+                }
+            }
         }
 
         $this->pdf->file->Output();
@@ -68,7 +85,9 @@ class TicketprintView extends View {
         $logo = new Media(Settings::get('forge-pdf-logo'));
 
         $this->pdf->file->SetX(0);
-        $this->pdf->file->Image($logo->getAbsolutePath(), $offsetLeft, 20, 30, 0, 'PNG');
+        if($logo->getAbsolutePath() != '') {
+            $this->pdf->file->Image($logo->getAbsolutePath(), $offsetLeft, 20, 30, 0, 'PNG');
+        }
         $this->pdf->file->SetFont('Arial','B',16);
         $this->pdf->file->SetXY($offsetLeft, $offsetY);
         $this->pdf->file->Cell(
