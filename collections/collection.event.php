@@ -190,7 +190,7 @@ class EventCollection extends DataCollection {
             'seatplan' => $seatplan ? $seatplan->draw() : false,
             'participants' => $people,
             'noSeat' => $seatplan ? i('No Seat selected', 'forge-events') : '',
-            'searchLabel' => i('Search Particpant', 'forge-events')
+            'searchLabel' => i('Search Participant', 'forge-events')
         ]);
 
         return $return;
