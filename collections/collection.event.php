@@ -345,6 +345,7 @@ class EventCollection extends DataCollection {
 
     public function getEventSoldAmount($eventId) {
         $colItem = new CollectionItem($eventId);
+
         if($colItem->getMeta('disable-seatplan') == 'on') {
             return $this->getSoldAmountByPayments($eventId);
         } else {
