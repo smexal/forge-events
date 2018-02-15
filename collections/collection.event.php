@@ -5,6 +5,7 @@ namespace Forge\Modules\ForgeEvents;
 use Forge\Core\Classes\Builder;
 use Forge\Core\Classes\Localization;
 use Forge\Core\Classes\Settings;
+use Forge\Modules\ForgeEvents\Participants;
 use \Forge\Core\Abstracts\DataCollection;
 use \Forge\Core\App\App;
 use \Forge\Core\App\Auth;
@@ -77,7 +78,7 @@ class EventCollection extends DataCollection {
             'price_label' => i('Price', 'forge-events'),
             'price' => Utils::formatAmount($item->getMeta('price'), true),
             'participants_amount_label' => i('Amount of participants', 'forge-events'),
-            'participants_amount' => $this->getEventMaximumAmount($item->id),
+            'participants_amount' => $sold .' / '. $this->getEventMaximumAmount($item->id),
             'address' => $item->getMeta('address'),
             'signup' => $item->getMeta('allow-signup'),
             'signup_text' => $buttonText,
@@ -349,24 +350,21 @@ class EventCollection extends DataCollection {
         if($colItem->getMeta('disable-seatplan') == 'on') {
             return $this->getSoldAmountByPayments($eventId);
         } else {
+            return $this->getSoldAmountByPayments($eventId);
+
+            $soldSeats = $this->getSoldAmountByPayments($eventId);
             $sp = new Seatplan($eventId);
-            return $sp->getSoldAmount();
+            $manually = $sp->getManuallySoldItems();
+            return $manually + $soldSeats;
         }
     }
 
     public function getSoldAmountByPayments($itemId) {
         $amt = 0;
         $db = App::instance()->db;
-        $db->where('meta', '%collection%22%3A'.$itemId.'%', 'LIKE');
-        $db->where('status', 'success');
-        $parts = $db->get('forge_payment_orders');
-        foreach($parts as $part) {
-            $meta = json_decode(urldecode($part['meta']));
-            foreach($meta->items as $item) {
-                $amt++;
-            }
-        }
-        return $amt;
+
+        $participants = new Participants($itemId);
+        return count($participants->getAll());
     }
 
     private function seatPlan() {

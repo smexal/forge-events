@@ -83,6 +83,21 @@ class Seatplan {
         return $amount;
     }
 
+    public function getManuallySoldItems() {
+        $amount = 0;
+        $countsAsSold = ['sold', 'blocked'];
+        foreach($this->seats as $seat) {
+            $status = $this->getSeatStatus($seat['x'], $seat['y']);
+            if(in_array($status, $countsAsSold)) {
+                if($status == 'sold' && $this->isUserSeat($seat['x'], $seat['y'])) {
+                    continue;
+                }
+                $amount++;
+            }
+        }
+        return $amount;
+    }
+
     public function getUserSeat($user) {
         $db = App::instance()->db;
         if(is_object($this->event)) {

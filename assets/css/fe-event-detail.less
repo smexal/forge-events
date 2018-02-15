@@ -21,6 +21,29 @@
     h4 {
         margin: 0;
     }
+    position: relative;
+
+    &:hover {
+        .action {
+            opacity: 1;
+        }
+    }
+
+    .action {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        right: 20px;
+        height: 100%;
+        margin-top: -10px;
+        opacity: 0;
+        transition: 300ms;
+
+        i {
+            font-size: 18px;
+            height: 18px;
+        }
+    }
 
     .avatar, .icon-container {
         width: 64px;
