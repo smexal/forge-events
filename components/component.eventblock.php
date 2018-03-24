@@ -91,7 +91,7 @@ class EventblockComponent extends Component {
             'lead' => $item->getMeta('description'),
             'text' => $item->getMeta('text'),
             'when_label' => i('When?', 'allocate'),
-            'when_value' => Utils::dateFormat($item->getMeta('start-date'), true),
+            'when_value' => $item->getMeta('start-date'),
             'where_label' => i('Where?', 'allocate'),
             'where_value' => $item->getMeta('address'),
             'price_label' => i('How much?', 'allocate'),
