@@ -67,8 +67,6 @@ class ForgeEvents extends Module {
         Loader::instance()->addStyle("modules/forge-events/assets/css/forge-events.less");
         Loader::instance()->addScript("modules/forge-events/assets/scripts/forge-events.js");
         //Loader::instance()->addScript("modules/forge-events/assets/scripts/instascan.min.js");
-        //Loader::instance()->addScript("modules/forge-events/assets/scripts/forge-checkin.js");
-        //Loader::instance()->addStyle("modules/forge-events/assets/css/forge-checkin.less");
 
         // frontend
         App::instance()->tm->theme->addScript($this->url() . "assets/scripts/forge-events.js", true);
@@ -93,17 +91,6 @@ class ForgeEvents extends Module {
 
         // register API
         API::instance()->register('forge-events', array($this, 'apiEventsAdapter'));
-        API::instance()->register('checkin', array($this, 'apiCheckinAdapter'));
-
-        // backend navigation
-        ModifyHandler::instance()->add('modify_manage_navigation', [$this, 'modifyManageNavigation']);
-    }
-
-    public function modifyManageNavigation($navigation) {
-        if(Auth::allowed($this->permission_checkin, true)) {
-            $navigation->add('checkin', i('Event checkin'), Utils::getUrl(array('manage', 'checkin')), 'leftPanel', 'exit_to_app');
-        }
-        return $navigation;
     }
 
     public function orderTableHeading($ths) {
@@ -153,32 +140,6 @@ class ForgeEvents extends Module {
                 return false;
 
         }
-    }
-
-    public function apiCheckinAdapter($data) {
-        if (Auth::allowed($this->permission_checkin)) {
-            switch ($data) {
-                case 'scan':
-                    $orderId = Utils::decodeBase64($_GET['id']);
-                    $order = Payment::getOrder($orderId);
-                    switch ($order->data['status']) {
-                        case 'success':
-                            return json_encode(array("status" => 'success', 'text' => i('Erfolgreich')));
-                            break;
-                        case 'open':
-                            return json_encode(array("status" => 'unpaid', 'text' => i('Ticket nicht bezahlt')));
-                            break;
-                        case 'draft':
-                            return json_encode(array("status" => 'unpaid', 'text' => i('Ticket nicht bezahlt')));
-                            break;
-                        default:
-                            return json_encode(array("status" => 'error', 'text' => i('Fehlgeschlagen')));
-                            break;
-                    }
-                    break;
-            }
-        }
-        return null;
     }
 
     private function registerSettings() {

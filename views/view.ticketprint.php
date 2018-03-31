@@ -99,7 +99,7 @@ class TicketprintView extends View {
 
         /* QR */
         $get = ['id' => Utils::encodeBase64($order->data['id'])];
-        $checkInUrl = Utils::getUrl(['api', 'checkin', 'scan'], true, $get, false, true);
+        $checkInUrl = Utils::getUrl(['manage', 'checkin'], true, $get, false, true);
         $image = Utils::getUrl(['fe-qr'], true, ['text' => $checkInUrl], false, true);
         $this->pdf->file->Image($image, 140, 35, 40, 0, 'PNG');
 
