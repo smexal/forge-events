@@ -179,15 +179,22 @@ class Participants {
 
     private function actions($id) {
         return App::instance()->render(CORE_TEMPLATE_DIR."assets/", "table.actions", array(
-            'actions' => array(
-                array(
+            'actions' => [
+                [
                     "url" => Utils::getUrl(Utils::getUriComponents(), true, ['deleteSeat' => $id]),
                     "icon" => "delete",
                     "name" => i('Delete Seat Reservation', 'forge-events'),
                     "ajax" => true,
                     "confirm" => false
-                )
-            )
+                ],
+                [
+                    "url" => Utils::getUrl(Utils::getUriComponents(), true, ['checkIn' => $id]),
+                    "icon" => "check_circle",
+                    "name" => i('Manually Checkin this user', 'forge-events'),
+                    "ajax" => true,
+                    "confirm" => false
+                ]
+            ]
         ));
     }
 
@@ -196,6 +203,15 @@ class Participants {
         $db->where('event_id', $this->eventId);
         $db->where('id', $id);
         $db->delete('forge_events_seat_reservations');
+    }
+
+    public function checkin($id) {
+        $db = App::instance()->db;
+        $db->where('event_id', $this->eventId);
+        $db->where('id', $id);
+        $db->update('forge_events_seat_reservations', [
+            'checkin' => $db->now()
+        ]);
     }
 
 }

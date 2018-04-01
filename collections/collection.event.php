@@ -275,8 +275,13 @@ class EventCollection extends DataCollection {
             $participants->isAdmin = true;
         }
 
-        if(array_key_exists('deleteSeat', $_GET) && is_numeric($_GET['deleteSeat'])) {
-            $participants->delete($_GET['deleteSeat']);
+        if($participants->isAdmin) {
+            if(array_key_exists('deleteSeat', $_GET) && is_numeric($_GET['deleteSeat'])) {
+                $participants->delete($_GET['deleteSeat']);
+            }
+            if(array_key_exists('checkIn', $_GET) && is_numeric($_GET['checkIn'])) {
+                $participants->checkin($_GET['checkIn']);
+            }
         }
         return $participants->renderTable();
     }

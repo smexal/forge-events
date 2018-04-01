@@ -43,7 +43,6 @@ class ForgeEvents extends Module {
             );
         }
 
-
         Auth::registerPermissions($this->permission);
         Auth::registerPermissions("manage.forge-events.ticket-status.view");
         Auth::registerPermissions("manage.forge-events.ticket-status.edit");

@@ -114,6 +114,33 @@ class Seatplan {
         return '';
     }
 
+    public function checkin($userId) {
+        $db = App::instance()->db;
+        if(is_object($this->event)) {
+            $id = $this->event->id;
+        } else {
+            $id = $this->event;
+        }
+        $db->where('event_id', $id);
+        $db->where('user', $userId);
+        $db->update('forge_events_seat_reservations', [
+            'checkin' => $db->now()
+        ]);
+    }
+
+    public function checkinTime($userId) {
+        $db = App::instance()->db;
+        if(is_object($this->event)) {
+            $id = $this->event->id;
+        } else {
+            $id = $this->event;
+        }
+        $db->where('event_id', $id);
+        $db->where('user', $userId);
+        $data = $db->getOne('forge_events_seat_reservations');
+        return $data['checkin'];
+    }
+
     public static function getSeatId($seat, $eventId) {
         if(is_string($seat)) {
             $seat = explode(":", $seat);
@@ -178,24 +205,17 @@ class Seatplan {
                     $columns[$name] = array(
                         'status' => $status,
                         'tooltip' => false,
-                        'user' => false
+                        'user' => false,
+                        'checkin' => false
                     );
                 } else {
                     $seatInfo = $this->getSeatInfo($name, $no, $status);
-                    $columns[$name] = array(
+                    $columns[$name] = [
                         'status' => $status,
                         'tooltip' => $seatInfo['tooltip'],
-                        'user' => $seatInfo['user']
-                        /*'tipurl' => Utils::getUrl(array(
-                            "api",
-                            "forge-events",
-                            "seatplan",
-                            "seatstatus",
-                            $this->event,
-                            $name,
-                            $no
-                        ))*/
-                    );
+                        'user' => $seatInfo['user'],
+                        'checkin' => $seatInfo['checkin']
+                    ];
                 }
             }
             $name++;
@@ -236,13 +256,20 @@ class Seatplan {
             $user = $this->getSoldUser($name, $no);
         }
         $username = false;
+        $checkin = false;
         if($user) {
             $status = sprintf(i('Sold to %s', 'forge-events'), $user->get('username'));
             $username = $user->get('username');
+            $time = $this->checkinTime($user->get('id'));
+            if(! is_null($time)) {
+                $checkin = $time;
+                $status = $user->get('username');
+            }
         }
         return [
             'tooltip' => $name.':'.$no.' - '.i($status),
-            'user' => $username
+            'user' => $username,
+            'checkin' => $checkin
         ];
     }
 
