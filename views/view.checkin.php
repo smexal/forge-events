@@ -3,7 +3,10 @@
 namespace Forge\Modules\ForgeEvents;
 
 use Forge\Core\Abstracts\View;
+use Forge\Core\App\App;
 use Forge\Core\App\Auth;
+use Forge\Core\Classes\Utils;
+use Forge\Modules\ForgePayment\Payment;
 
 class CheckinView extends View {
 
@@ -13,6 +16,31 @@ class CheckinView extends View {
     public $standalone = true;
 
     public function content($uri = array()) {
-        return $_GET['id'];
+        $orderId = Utils::decodeBase64($_GET['id']);
+        $order = Payment::getOrder($orderId);
+        $status_message = '';
+        $additional_message = '';
+        $status = 'error';
+        if(is_null($order->data['paymentMeta'])) {
+            $status_message = i('No Order found', 'forge-events');
+            $additional_message = 'ID: '.$orderId;
+        }
+
+        var_dump($order->getMeta());
+
+        // check if order is paid...
+
+        // check if user has a seat on the seat plan (event)
+
+        // check if user is not already checked in
+
+        // if all yes => check in the user for this event
+
+        return App::instance()->render(MOD_ROOT.'forge-events/templates/parts', 'checkin', [
+            'title' => i('Checkin', 'forge-events'),
+            'status_message' => $status_message,
+            'status' => $status,
+            'additional_message' => $additional_message
+        ]);
     }
 }

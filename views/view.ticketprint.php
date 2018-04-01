@@ -67,7 +67,7 @@ class TicketprintView extends View {
             }
         }
 
-        $this->pdf->file->Output();
+        $this->pdf->file->Output("I", "event-ticket-".App::instance()->user->get('id').".pdf");
         
     }
 
@@ -98,7 +98,10 @@ class TicketprintView extends View {
         );
 
         /* QR */
-        $get = ['id' => Utils::encodeBase64($order->data['id'])];
+        $get = [
+            'id' => Utils::encodeBase64($order->data['id']),
+            'u' => Utils::encodeBase64($item->user)
+        ];
         $checkInUrl = Utils::getUrl(['manage', 'checkin'], true, $get, false, true);
         $image = Utils::getUrl(['fe-qr'], true, ['text' => $checkInUrl], false, true);
         $this->pdf->file->Image($image, 140, 35, 40, 0, 'PNG');

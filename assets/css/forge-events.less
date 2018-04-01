@@ -175,3 +175,26 @@
     width: 100%;
     min-height: 480px;
 }
+.checkin {
+    .status {
+        background-color: #42A5F5;
+        padding: 80px 0;
+        text-align: center;
+        text-transform: uppercase;
+        font-weight: 600;
+        font-size: 32px;
+
+        span {
+            display: block;
+
+            &.additional {
+                font-size: 24px;
+            }
+        }
+
+        &.error {
+            color: white;
+            background-color: red;
+        }
+    }
+}
