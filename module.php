@@ -62,6 +62,16 @@ class ForgeEvents extends Module {
             );
         }
 
+        // google maps
+        // // https://maps.googleapis.com/maps/api/js?key=AIzaSyCUhl24DMsrw9U02Q3hR6LGYF_6oYoqEx0
+        $key = Settings::get('google_api_key');
+        if (!$key) {
+            Logger::debug('No Google API Key defined for maps.');
+        } else {
+            App::instance()->tm->theme->addScript('//maps.googleapis.com/maps/api/js?key=' . $key, true);
+            App::instance()->tm->theme->addScript($this->url() . "assets/scripts/forge-events-map.js", true);
+        }
+
         // backend
         Loader::instance()->addStyle("modules/forge-events/assets/css/forge-events.less");
         Loader::instance()->addScript("modules/forge-events/assets/scripts/forge-events.js");
@@ -72,16 +82,6 @@ class ForgeEvents extends Module {
 
         App::instance()->tm->theme->addScript(CORE_WWW_ROOT . "ressources/scripts/tablebar.js", true);
         App::instance()->tm->theme->addScript(CORE_WWW_ROOT . "ressources/scripts/externals/tooltipster.bundle.min.js", true);
-
-        // google maps
-        // // https://maps.googleapis.com/maps/api/js?key=AIzaSyCUhl24DMsrw9U02Q3hR6LGYF_6oYoqEx0
-        $key = Settings::get('google_api_key');
-        if (!$key) {
-            Logger::debug('No Google API Key defined for maps.');
-        } else {
-            App::instance()->tm->theme->addScript('//maps.googleapis.com/maps/api/js?key=' . $key, true);
-            App::instance()->tm->theme->addScript($this->url() . "assets/scripts/forge-events-map.js", true);
-        }
 
         App::instance()->tm->theme->addStyle(MOD_ROOT . "forge-events/assets/css/forge-events.less");
         App::instance()->tm->theme->addStyle(MOD_ROOT . "forge-events/assets/css/event-block.less");
