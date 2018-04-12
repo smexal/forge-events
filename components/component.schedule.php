@@ -28,6 +28,12 @@ class ScheduleComponent extends Component {
                 'hint' => '',
                 'key' => $this->prefix.'location',
                 'type' => 'text'
+            ],
+            [
+                'label' => i('Highlight', 'forge-events'),
+                'hint' => '',
+                'key' => $this->prefix.'highlight',
+                'type' => 'checkbox'
             ]
         ];
         return [
@@ -42,10 +48,15 @@ class ScheduleComponent extends Component {
 
     public function content() {
         return App::instance()->render(DOC_ROOT.'modules/forge-events/templates/', "schedule-block", [
+            'highlight' => $this->getField($this->prefix.'highlight'),
             'time' => $this->getField($this->prefix.'time'),
             'location' => $this->getField($this->prefix.'location'),
             'entry' => $this->getField($this->prefix.'entry')
         ]);
+    }
+
+    public function customBuilderContent() {
+        return $this->getField($this->prefix.'time'). ' : '.$this->getField($this->prefix.'entry');
     }
 }
 
