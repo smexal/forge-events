@@ -1,0 +1,13 @@
+<div class="user-ticket-progress card">
+    <h4>{$title}</h4>
+    {loop="$steps"}
+        <div class="step reveal{if="$value.done"} done{/if}">
+            <span class="no">{if="$value.done"}<i class="material-icons">check</i>{else}{$value.no}{/if}</span>
+            <small>
+                {if="$value.link && ! $value.done"}<a href="{$value.link}">{/if}
+                    {$value.label}
+                {if="$value.link && ! $value.done"}</a>{/if}
+            </small>
+        </div>
+    {/loop}
+</div>

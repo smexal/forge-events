@@ -133,6 +133,42 @@ class EventCollection extends DataCollection {
         ]);
     }
 
+    public function getUserTicketProgress($item) {
+        $itemId = $item->getID();
+        $user = App::instance()->user;
+        $sp = new SeatPlan($itemId);
+        $steps = [
+            [
+                'no' => '1.',
+                'label' => i('Create a user and log in', 'forge-events'),
+                'link' => Utils::url(['event-signup', $item->slug()]),
+                'done' => Auth::any() ? true : false
+            ],
+            [
+                'no' => '2.',
+                'label' => i('Buy Tickets', 'forge-events'),
+                'link' => Utils::url(['event-signup', $item->slug()]),
+                'done' => $user && ! $this->userTicketAvailable($itemId, $user) ? true : false
+            ],
+            [
+                'no' => '3.',
+                'label' => i('Choose your seat', 'forge-events'),
+                'link' => Utils::url(['event-signup', $item->slug()]),
+                'done' => $user && $sp->getUserSeat($user->get('id')) != '' ? true : false,
+            ],
+            [
+                'no' => '4.',
+                'label' => i('Print your ticket', 'forge-events'),
+                'link' => App::instance()->vm->getViewByName('orders')->buildURL(),
+                'done' => false
+            ]
+        ];
+        return App::instance()->render(MOD_ROOT.'forge-events/templates/parts', 'user-ticket-progress', [
+            'title' => sprintf(i('Your progress towards the event.'), $item->getMeta('title')),
+            'steps' => $steps
+        ]);
+    }
+
     public function tournaments($item) {
         $this->item = $item;
         $return = '';

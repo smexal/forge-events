@@ -34,3 +34,48 @@
         }
     }
 }
+
+.user-ticket-progress {
+    margin-top: 20px;
+    background-color: rgba(0,0,0,0.1);
+    border-radius: 5px;
+
+    .step {
+        margin-bottom: 15px;
+
+        &.done {
+            opacity: 0.5;
+        }
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        small {
+            display: inline-block;
+
+            a {
+                color: #FAFAFA;
+                &:hover {
+                    color: #FFFFFF;
+                }
+            }
+        }
+
+        .no {
+            background-color: rgba(255,255,255,0.05);
+            font-weight: bold;
+            border-radius: 100px;
+            font-size: 0.725em;
+            i {
+                font-size: 1em;
+            }
+            line-height: 24px;
+            width: 24px;
+            height: 24px;
+            display: inline-block;
+            text-align: center;
+            margin-right: 10px;
+        }
+    }
+}

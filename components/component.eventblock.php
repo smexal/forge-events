@@ -47,6 +47,11 @@ class EventblockComponent extends Component {
                 'label' => i('Secondary CTA URL', 'forge-events'),
                 'key' => $this->prefix.'secondary_cta_url',
                 'type' => 'url'
+            ],
+            [
+                'label' => i('Show user ticket progress', 'forge-events'),
+                'key' => $this->prefix.'user_ticket_progress_active',
+                'type' => 'checkbox'
             ]
         ];
         return [
@@ -101,8 +106,13 @@ class EventblockComponent extends Component {
             'secondary_cta_title' => $this->getField($this->prefix.'secondary_cta_title'),
             'secondary_cta_url' => $this->getField($this->prefix.'secondary_cta_url'),
             'progress_amount' => $percent,
-            'remaining_seats' => sprintf(i('%1$s available tickets', 'forge-events'), $remaining), 
+            'remaining_seats' => sprintf(i('%1$s available tickets', 'forge-events'), $remaining),
+            'ticket_progress' => $this->getField($this->prefix.'user_ticket_progress_active') ? $this->getUserTicketProgress($collection, $item) : false
         ]);
+    }
+
+    private function getUserTicketProgress($collection, $item) {
+        return $collection->getUserTicketProgress($item);
     }
 }
 

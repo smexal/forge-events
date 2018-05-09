@@ -31,6 +31,9 @@
                 <div class="fact"><p class="discreet">{$when_label}</p><h3>{$when_value}</h3></div>
                 <div class="fact"><p class="discreet">{$where_label}</p><h3>{$where_value}</h3></div>
                 <div class="fact"><p class="discreet">{$price_label}</p><h3>{$price_value}</h3></div>
+                {if="$ticket_progress"}
+                    {$ticket_progress}
+                {/if}
             </div>
         </div>
     </div>
