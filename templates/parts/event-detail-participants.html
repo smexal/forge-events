@@ -1,4 +1,3 @@
-{if="$seatplan"}
 <!-- Seatplan -->
 <div class="wrapper">
     <div class="row">
@@ -6,6 +5,7 @@
             <h1>{$participants_title}</h1>
         </div>
     </div>
+    {if="$seatplan"}
     <div class="search-field form-group reveal">
         <label class='control-label'>{$searchLabel}</label>
         <input type="text" id="searchParticipants" name="search" />
@@ -19,6 +19,7 @@
             </div>
         </div>
     </div>
+    {/if}
 
     <!-- Participants -->
     <div class="row">
@@ -42,6 +43,4 @@
             </div>
         </div>
     </div>
-
 </div>
-{/if}

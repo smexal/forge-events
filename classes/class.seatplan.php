@@ -403,6 +403,7 @@ class Seatplan {
 
         $this->db->where('x', $seat['x']);
         $this->db->where('y', $seat['y']);
+        $this->db->where('event', $seat['event']);
         $data = $this->db->getOne($this->seatTable);
         if(count($data) > 0) {
             $this->db->where('id', $data['id']);
