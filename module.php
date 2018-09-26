@@ -41,6 +41,10 @@ class ForgeEvents extends Module {
                 'modify_order_table_td',
                 [$this, 'orderTableRow']
             );
+            ModifyHandler::instance()->add(
+                'update_item_filter_order_table',
+                [$this, 'itemFilterOrderTable']
+            );
         }
 
         Auth::registerPermissions($this->permission);
@@ -90,6 +94,17 @@ class ForgeEvents extends Module {
 
         // register API
         API::instance()->register('forge-events', array($this, 'apiEventsAdapter'));
+    }
+
+    public function itemFilterOrderTable($filterValues) {
+        $collection = App::instance()->cm->getCollection('forge-events');
+
+        $newValues = [];
+        foreach($collection->items() as $item) {
+            $newValues['item:'.$item->id] = $item->getMeta('title');
+        }
+
+        return array_merge($filterValues, $newValues);
     }
 
     public function orderTableHeading($ths) {
