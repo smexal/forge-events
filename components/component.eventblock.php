@@ -87,7 +87,11 @@ class EventblockComponent extends Component {
 
         $max = $collection->getEventMaximumAmount($eventId);
         $sold = $collection->getEventSoldAmount($eventId);
-        $percent = 100 / $max * $sold;
+        if($max && $sold > 0) {
+            $percent = 100 / $max * $sold;
+        } else {
+            $percent = 0;
+        }
         $remaining = $max - $sold;
 
         return App::instance()->render(DOC_ROOT.'modules/forge-events/templates/', "event-block", [
