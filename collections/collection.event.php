@@ -55,7 +55,11 @@ class EventCollection extends DataCollection {
 
         $max = $this->getEventMaximumAmount($item->id);
         $sold = $this->getEventSoldAmount($item->id);
-        $percent = 100 / $max * $sold;
+        if($max > 0 && $sold > 0) {
+            $percent = 100 / $max * $sold;
+        } else {
+            $percent = 0;
+        }
 
         $builder = new Builder('collection', $item->id, 'defaultEventBuilder');
         $elements = $builder->getBuilderElements(Localization::getCurrentLanguage());
@@ -238,7 +242,7 @@ class EventCollection extends DataCollection {
         return $builder->render();
     }
 
-    public function getSubnavigation() {
+    public function getSubnavigation($item) {
         $base = [
             [
                 'url' => 'participants',
@@ -254,8 +258,8 @@ class EventCollection extends DataCollection {
             ]
         ];
 
-        $seatplan = null;
-        if(Settings::get('forge-events-seatplan')) {
+        $seatplan = [];
+        if(Settings::get('forge-events-seatplan') && $item->getMeta('disable-seatplan') != 'on') {
             $seatplan = [
                 [
                     'url' => 'seatplan',
