@@ -101,10 +101,12 @@ class ForgeEvents extends Module {
 
         $newValues = [];
         foreach($collection->items() as $item) {
-            $newValues['item:'.$item->id] = $item->getMeta('title');
+            if($item->getMeta('price') > 0 && $item->getMeta('status') == 'published') {
+                $newValues['item:'.$item->id] = $item->getMeta('title');
+            }
         }
 
-        return array_merge($filterValues, $newValues);
+        return array_reverse(array_merge($filterValues, $newValues));
     }
 
     public function orderTableHeading($ths) {
