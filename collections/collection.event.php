@@ -141,6 +141,7 @@ class EventCollection extends DataCollection {
         $itemId = $item->getID();
         $user = App::instance()->user;
         $sp = new SeatPlan($itemId);
+
         $steps = [
             [
                 'no' => '1.',
@@ -152,7 +153,7 @@ class EventCollection extends DataCollection {
                 'no' => '2.',
                 'label' => i('Buy Tickets', 'forge-events'),
                 'link' => Utils::url(['event-signup', $item->slug()]),
-                'done' => $user && ! $this->userTicketAvailable($itemId, $user) ? true : false
+                'done' => $user && ! $this->userTicketAvailable($itemId, $user->get('id')) ? true : false
             ],
             [
                 'no' => '3.',
@@ -340,8 +341,8 @@ class EventCollection extends DataCollection {
                 if (!is_numeric($user)) {
                     $user = User::exists($user);
                 }
-                if (!is_numeric($user)) {
-                    return false;
+                if (is_object($user)) {
+                    $user = $user->get('id');
                 }
                 if ($itemInOrder->user == $user && $itemInOrder->collection == $id) {
                     return false;
