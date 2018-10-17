@@ -77,6 +77,10 @@ class EventCollection extends DataCollection {
             'text' => $item->getMeta('text'),
             'start_date_label' => i('Starting date', 'forge-events'),
             'start_date' => $item->getMeta('start-date'),
+            'end_date_label' => i('Ending date', 'forge-events'),
+            'end_date' => $item->getMeta('end-date'),
+            'opening_times_label' => i('Opening Times', 'forge-events'),
+            'opening_times' => $item->getMeta('opening-times'),
             'location_label' => i('Location', 'forge-events'),
             'location' => $item->getMeta('address'),
             'price_label' => i('Price', 'forge-events'),
@@ -98,13 +102,17 @@ class EventCollection extends DataCollection {
                 'url' => $this->item->url(),
                 'title' => i('General', 'forge-events'),
                 'active' => $view == 'default' ? 'active' : ''
-            ], 
-            [
-                'url' => $this->item->url().'/participants',
-                'title' => i('Participants', 'forge-events'),
-                'active' => $view == 'participants' ? 'active' : ''
             ]
         ];
+        if($this->getEventMaximumAmount($this->item->id) > 0) {
+            array_merge($items, [
+                [
+                    'url' => $this->item->url().'/participants',
+                    'title' => i('Participants', 'forge-events'),
+                    'active' => $view == 'participants' ? 'active' : ''
+                ]
+            ]);
+        }
 
         $builder = new Builder('collection', $this->item->id, 'tournamentsEventBuilder');
         $tournamentElements = $builder->getBuilderElements(Localization::getCurrentLanguage());
@@ -130,6 +138,9 @@ class EventCollection extends DataCollection {
                     'active' => $view == 'more' ? 'active' : ''
                 ]
             ]);
+        }
+        if(count($items) == 1) {
+            return '';
         }
 
         return App::instance()->render(MOD_ROOT.'forge-events/templates/parts', 'event-detail-navigation', [
@@ -464,6 +475,15 @@ class EventCollection extends DataCollection {
                         'multilang' => true,
                         'type' => 'datetime',
                         'order' => 30,
+                        'position' => 'right',
+                        'hint' => ''
+                    ),
+                    array (
+                        'key' => 'opening-times',
+                        'label' => i('Opening Times', 'forge-events'),
+                        'multilang' => true,
+                        'type' => 'text',
+                        'order' => 31,
                         'position' => 'right',
                         'hint' => ''
                     ),

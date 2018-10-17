@@ -42,7 +42,7 @@ class EventlistingComponent extends ListingComponent {
 
     public function modifyCollectionListingOrder($items) {
         usort($items, [$this, 'arraySort']);
-        return array_reverse($items);
+        return $items;
     }
 
     public function arraySort( $a, $b ) {
@@ -84,6 +84,7 @@ class EventlistingComponent extends ListingComponent {
             'description' => $item->getMeta('description'),
             'start_date' => $item->getMeta('start-date'),
             'end_date' => $item->getMeta('end-date'),
+            'opening_times' => strlen($item->getMeta('opening-times')) ? i('Opening Times: ', 'forge-events').$item->getMeta('opening-times') : '',
             'image' => $image ? $image->getUrl() : false,
             'text' => $item->getMeta('text'),
             'url' => $item->getMeta('hide-detail') == 'on' ? false : $item->url()
