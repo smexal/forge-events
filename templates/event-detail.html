@@ -32,20 +32,24 @@
                     <span class="before">{$start_date_label}</span>
                     <span class="main">{$start_date}</span>
                 </div>
+                {if="$end_date"}
                 <div class="facts-block smaller">
                     <span class="before">{$end_date_label}</span>
                     <span class="main">{$end_date}</span>
                 </div>
+                {/if}
                 {if="$opening_times"}
                 <div class="facts-block smaller">
                     <span class="before">{$opening_times_label}</span>
                     <span class="main">{$opening_times}</span>
                 </div>
                 {/if}
+                {if="$location"}
                 <div class="facts-block smaller">
                     <span class="before">{$location_label}</span>
                     <span class="main">{$location}</span>
                 </div>
+                {/if}
                 {if="$participants_amount > 0"}
                 <div class="facts-block">
                     <span class="before">{$participants_amount_label}</span>
