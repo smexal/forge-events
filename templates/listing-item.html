@@ -2,6 +2,7 @@
     <div>
         <h3>{$title}</h3>
         <p class="alternative">{$start_date} – {$end_date}</p>
+        {if="$description"}<p>{$description}</p>{/if}
     </div>
     <div class="right">
         {$opening_times}
