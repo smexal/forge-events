@@ -110,9 +110,17 @@ class ForgeEvents extends Module {
     }
 
     public function orderTableHeading($ths) {
+        if(App::instance()->mm->isActive('forge-fpdf')) {
+            $ths[] = [
+                'id' => 'ticket',
+                'content' => i('Ticket', 'forge-events'),
+                'class' => '',
+                'cellAction' => ''
+            ];
+        }
         $ths[] = [
-            'id' => 'ticket',
-            'content' => i('Ticket', 'forge-events'),
+            'id' => 'detail',
+            'content' => i('Detail', 'forge-events'),
             'class' => '',
             'cellAction' => ''
         ];
@@ -120,9 +128,17 @@ class ForgeEvents extends Module {
     }
 
     public function orderTableRow($td, $args) {
+        if(App::instance()->mm->isActive('forge-fpdf')) {
+            $td[] = [
+                'id' => 'ticket',
+                'content' => '<a target="blank" href="' . Utils::getUrl(['fe-ticket-print', $args['order']]) . '">' . i('Print Ticket', 'forge-events') . '</a>',
+                'class' => '',
+                'cellAction' => ''
+            ];
+        }
         $td[] = [
-            'id' => 'ticket',
-            'content' => '<a target="blank" href="' . Utils::getUrl(['fe-ticket-print', $args['order']]) . '">' . i('Print Ticket', 'forge-events') . '</a>',
+            'id' => 'details',
+            'content' => '<a class="confirm ajax" href="' . Utils::getUrl(['manage', 'module-settings', 'forge-payment', 'orders', 'detail', $args['order']]) . '">' . i('Details', 'forge-events') . '</a>',
             'class' => '',
             'cellAction' => ''
         ];
