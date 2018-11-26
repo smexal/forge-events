@@ -1,10 +1,10 @@
-<a class="listing-item event {$classes}" {if="$url"}href="{$url}"{/if} {if="$image"}style="background-image:url('{$image}');"{/if}>
+<a class="listing-item event {$classes}" {if="$url"}href="{$url}"{/if}>
     <div>
         <h3>{$title}</h3>
         <p class="alternative">{$start_date}{if="$end_date"} – {$end_date}{/if}</p>
         {if="$description"}<p>{$description}</p>{/if}
     </div>
     <div class="right">
-        {$image}
+        <img width="120" src="{$image}" />
     </div>
 </a>
