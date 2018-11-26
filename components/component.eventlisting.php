@@ -49,8 +49,16 @@ class EventlistingComponent extends ListingComponent {
         if(! $a->getMeta('start-date')) {
             return -1;
         }
-        $tA = new \DateTime($a->getMeta('start-date'));
-        $tB = new \DateTime($b->getMeta('start-date'));
+        $ta = $a->getMeta('start-date');
+        $tb = $b->getMeta('start-date');
+        if(is_numeric($ta)) {
+            $ta = "01.01.".$ta;
+        }
+        if(is_numeric($tb)) {
+            $tb = "01.01.".$tb;
+        }
+        $tA = new \DateTime($ta);
+        $tB = new \DateTime($tb);
         $cmpA = $tA->getTimestamp();
         $cmpB = $tB->getTimestamp();
 
