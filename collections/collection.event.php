@@ -125,7 +125,20 @@ class EventCollection extends DataCollection {
                     'active' => $view == 'tournaments' ? 'active' : ''
                 ]
             ]);
-        }        
+        } 
+
+        $builder = new Builder('collection', $this->item->id, 'programmEventBuilder');
+        $tournamentElements = $builder->getBuilderElements(Localization::getCurrentLanguage());
+
+        if(count($tournamentElements) > 0) {
+            $items = array_merge($items, [
+                [
+                    'url' => $this->item->url().'/programm',
+                    'title' => i('Programm', 'forge-events'),
+                    'active' => $view == 'programm' ? 'active' : ''
+                ]
+            ]);
+        }
 
         $builder = new Builder('collection', $this->item->id, 'moreEventBuilder');
         $elements = $builder->getBuilderElements(Localization::getCurrentLanguage());
@@ -223,6 +236,25 @@ class EventCollection extends DataCollection {
         return $return;
     }
 
+    public function programm($item) {
+        $this->item = $item;
+        $return = '';
+
+        $return.= $this->renderSubnavigation('programm');
+
+        $builder = new Builder('collection', $this->item->id, 'programmEventBuilder');
+        $elements = $builder->getBuilderElements(Localization::getCurrentLanguage());
+
+        $builderContent = '';
+        foreach($elements as $element) {
+            $builderContent.=$element->content();
+        }
+
+        $return.= $builderContent;
+
+        return $return;
+    }
+
     public function participants($item) {
         $this->item = $item;
         $return = '';
@@ -265,6 +297,10 @@ class EventCollection extends DataCollection {
                 'title' => i('Tournaments', 'forge-events')
             ],
             [
+                'url' => 'programm',
+                'title' => i('Programm', 'forge-events')
+            ],
+            [
                 'url' => 'more',
                 'title' => i('More Information', 'forge-events')
             ]
@@ -285,6 +321,11 @@ class EventCollection extends DataCollection {
 
     public function subviewTournaments($itemId) {
         $builder = new Builder('collection', $itemId, 'tournamentsEventBuilder');
+        return $builder->render();
+    }
+
+    public function subviewProgramm($itemId) {
+        $builder = new Builder('collection', $itemId, 'programmEventBuilder');
         return $builder->render();
     }
 

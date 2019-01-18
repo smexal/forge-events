@@ -6,6 +6,7 @@ use \Forge\Core\Classes\Utils;
 use \Forge\Core\Abstracts\Component;
 use \Forge\Core\App\App;
 use \Forge\Core\Classes\CollectionItem;
+use \Forge\Core\Classes\Media;
 
 class EventblockComponent extends Component {
     public $settings = [];
@@ -94,6 +95,9 @@ class EventblockComponent extends Component {
         }
         $remaining = $max - $sold;
 
+        $image = new Media($item->getMeta('header_image'));
+        $image = $image->getSizedImage(1920, 680);
+
         return App::instance()->render(DOC_ROOT.'modules/forge-events/templates/', "event-block", [
             'title' => $item->getMeta('title'),
             'blocktitle' => $this->getField($this->prefix.'title'),
@@ -111,7 +115,8 @@ class EventblockComponent extends Component {
             'secondary_cta_url' => $this->getField($this->prefix.'secondary_cta_url'),
             'progress_amount' => $percent,
             'remaining_seats' => sprintf(i('%1$s available tickets', 'forge-events'), $remaining),
-            'ticket_progress' => $this->getField($this->prefix.'user_ticket_progress_active') ? $this->getUserTicketProgress($collection, $item) : false
+            'ticket_progress' => $this->getField($this->prefix.'user_ticket_progress_active') ? $this->getUserTicketProgress($collection, $item) : false,
+            'header_image' => $image
         ]);
     }
 
