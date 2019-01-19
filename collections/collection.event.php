@@ -105,10 +105,10 @@ class EventCollection extends DataCollection {
             ]
         ];
         if($this->getEventMaximumAmount($this->item->id) > 0) {
-            array_merge($items, [
+            $items = array_merge($items, [
                 [
                     'url' => $this->item->url().'/participants',
-                    'title' => i('Participants', 'forge-events'),
+                    'title' => i('Participants & Seatplan', 'forge-events'),
                     'active' => $view == 'participants' ? 'active' : ''
                 ]
             ]);
