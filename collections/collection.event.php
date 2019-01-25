@@ -432,6 +432,20 @@ class EventCollection extends DataCollection {
         }
     }
 
+    public function getOrderByUser($id, $user) {
+        $db = App::instance()->db;
+        $db->where("status", "success");
+        $orders = $db->get("forge_payment_orders");
+        foreach ($orders as $order) {
+            $orderMeta = json_decode(urldecode($order['meta']));
+            foreach ($orderMeta->{'items'} as $itemInOrder) {
+                if ($itemInOrder->user == $user && $itemInOrder->collection == $id) {
+                    return $order;
+                }
+            }
+        }
+    }
+
     public function getEventMaximumAmount($eventId) {
         $colItem = new CollectionItem($eventId);
         if($colItem->getMeta('disable-seatplan') == 'on') {

@@ -52,6 +52,7 @@ class Seatplan {
             'status_list' => $this->getAllStatus(),
             'event_id' => $this->event,
             'api_url' => Utils::getUrl(array("api", "forge-events", "seatplan", "toggle-seat")),
+            'api_url_context' => Auth::allowed('manage.forge-events', true) ? Utils::getUrl(array("manage", "forge-event-seatplan-context")) : 'false',
             'column_names' => $this->getRow(1),
             'rows' => $this->getSeatRows(),
             'actions' => $this->actions

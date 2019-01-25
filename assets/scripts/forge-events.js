@@ -80,6 +80,26 @@ var forgeEvents = {
                             $(document).trigger("ajaxReload");
                         });
                     });
+
+                    // rightclick
+                    $(this).contextmenu(function(e) {
+                        if(! plan.data('api-context')) {
+                            return;
+                        }
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+
+                        // because if it's a link in a overlay replacing its content,
+                        // we have to save the required button data to a new object.
+                        var seat = $(this).data('cell-id');
+                        var fakeButton = $("<button>");
+                        fakeButton.data('open', plan.data('api-context') + '?event=' + eventId + '&x=' + seat + '&y=' + row);
+                        if($(this).hasClass('big-overlay')) {
+                            fakeButton.addClass('big-overlay');
+                        }
+                        var the_overlay = overlay.prepare();
+                        overlay.open(fakeButton, the_overlay);
+                    });
                 });
             })
         })
