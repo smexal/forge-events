@@ -29,8 +29,6 @@ class EventCollection extends DataCollection {
         $this->preferences['single-item'] = i('Event', 'forge-events');
         $this->preferences['has_image'] = true;
         $this->preferences['has_password'] = true;
-
-        $this->custom_fields();
     }
 
     public function render($item) {
@@ -484,7 +482,7 @@ class EventCollection extends DataCollection {
         return $sp->draw();
     }
 
-    private function custom_fields() {
+    public function custom_fields() {
         $this->addFields(
             array_merge(
                 [
