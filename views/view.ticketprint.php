@@ -79,14 +79,14 @@ class TicketprintView extends View {
         $this->pdf->file->SetTextColor(10, 10, 10);
 
         $offsetLeft = 20;
-        $outerRight = 170;
+        $outerRight = 175;
         $offsetY = 80;
 
         $logo = new Media(Settings::get('forge-pdf-logo'));
 
         $this->pdf->file->SetX(0);
         if($logo->getAbsolutePath() != '') {
-            $this->pdf->file->Image($logo->getAbsolutePath(), $offsetLeft, 20, 30, 0, 'PNG');
+            $this->pdf->file->Image($logo->getAbsolutePath(), $offsetLeft, 20, 40, 0, 'PNG');
         }
         $this->pdf->file->SetFont('Arial','B',16);
         $this->pdf->file->SetXY($offsetLeft, $offsetY);
@@ -173,6 +173,35 @@ class TicketprintView extends View {
         $this->pdf->file->SetFont('Arial','B', 7);
         $this->pdf->file->SetXY($offsetLeft, 270);
         $this->pdf->file->Cell(170, 6, utf8_decode(Settings::get('forge-events-ticket-footer-text')), 0, 1, 'C');
+
+
+        $offsetY+=40;
+
+        $logos = [];
+
+        $logos_nos = [1,2,3,4];
+        foreach($logos_nos as $logo_id) {
+            $logo = new Media(Settings::get('forge-events-ticket-logo-0'.$logo_id));
+            if($logo->getAbsolutePath() != '') {
+                $logos[] = $logo;
+            }
+        }
+        $offsetX = $outerRight / count($logos);
+        $logoWidth = $outerRight / count($logos) - (count($logos)*3);
+
+        $offsetLeft = 20;
+
+        foreach($logos as $logo) {
+            if($logo->getSimpleMime() == 'image-jpeg') {
+                $type = 'JPEG';
+            } else {
+                $type = 'PNG';
+            }
+            $this->pdf->file->SetX(0);
+            $this->pdf->file->Image($logo->getAbsolutePath(), $offsetLeft, $offsetY, $logoWidth, 0, $type);
+            $offsetLeft+=$offsetX;
+        }
+
         
     }
 }

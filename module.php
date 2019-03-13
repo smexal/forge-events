@@ -203,6 +203,33 @@ class ForgeEvents extends Module {
                 'label' => i('Footer Ticket Text', 'forge-events'),
                 'hint' => i('Footer Text for the pdf ticket.', 'forge-events')
             ), Settings::get('forge-events-ticket-footer-text')), 'forge-events-ticket-footer-text', 'left', 'forge-events');
+
+
+        // images for ticket
+        $set->registerField(
+            Fields::image(array(
+                'key' => 'forge-events-ticket-logo-01',
+                'label' => i('Logo for Ticket', 'forge-events') 
+        ), Settings::get('forge-events-ticket-logo-01')), 'forge-events-ticket-logo-01', 'left', 'forge-events');
+
+        $set->registerField(
+            Fields::image(array(
+                'key' => 'forge-events-ticket-logo-02',
+                'label' => i('Logo for Ticket', 'forge-events') 
+        ), Settings::get('forge-events-ticket-logo-02')), 'forge-events-ticket-logo-02', 'left', 'forge-events');
+
+        $set->registerField(
+            Fields::image(array(
+                'key' => 'forge-events-ticket-logo-03',
+                'label' => i('Logo for Ticket', 'forge-events') 
+        ), Settings::get('forge-events-ticket-logo-03')), 'forge-events-ticket-logo-03', 'left', 'forge-events');
+
+        $set->registerField(
+            Fields::image(array(
+                'key' => 'forge-events-ticket-logo-04',
+                'label' => i('Logo for Ticket', 'forge-events') 
+        ), Settings::get('forge-events-ticket-logo-04')), 'forge-events-ticket-logo-04', 'left', 'forge-events');
+
     }
 
     private function install() {
