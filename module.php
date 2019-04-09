@@ -70,7 +70,7 @@ class ForgeEvents extends Module {
         // // https://maps.googleapis.com/maps/api/js?key=AIzaSyCUhl24DMsrw9U02Q3hR6LGYF_6oYoqEx0
         $key = Settings::get('google_api_key');
         if (!$key) {
-            Logger::debug('No Google API Key defined for maps.');
+            //Logger::debug('No Google API Key defined for maps.');
         } else {
             App::instance()->tm->theme->addScript('//maps.googleapis.com/maps/api/js?key=' . $key, true);
             App::instance()->tm->theme->addScript($this->url() . "assets/scripts/forge-events-map.js", true);

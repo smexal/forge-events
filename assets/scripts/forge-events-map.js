@@ -4,11 +4,14 @@ var forgeEventsMap = {
     marker: false,
     mapOptions : {
         zoom: 17,
-        mapTypeId: google.maps.MapTypeId.ROADMAP 
     },
 
     init : function() {
-        geocoder = new google.maps.Geocoder();
+        if($("#map_canvas").length > 0) {
+            forgeEventsMap.mapOptions.mapTypeId = google.maps.MapTypeId.ROADMAP;
+            console.log('yes');
+            geocoder = new google.maps.Geocoder();
+        }
         $("#map_canvas").each(function() {
             var address = $(this).data('address');
             forgeEventsMap.map = new google.maps.Map($(this).get(0), forgeEventsMap.mapOptions);
