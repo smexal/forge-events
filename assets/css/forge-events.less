@@ -1,6 +1,5 @@
 .seatplan {
     border: 3px solid #eaeaea;
-    border-radius: 5px;
     padding: 10px;
     margin-bottom: 30px;
     position: relative;
@@ -12,7 +11,7 @@
     .legend {
         display: flex;
         flex-direction: row;
-        justify-content: flex-end;
+        justify-content: flex-start;
 
         .label {
             color: #333;
@@ -26,12 +25,10 @@
 
     .cell, .name {
         transition: 300ms;
-        width: 17px;
-        height: 17px;
+        width: 24px !important;
+        height: 24px !important;
         background-color: #FAFAFA;
         border: 1px solid #F0F0F0;
-        margin: 4px;
-        border-radius: 2px;
         cursor: pointer;
 
         i.material-icons {
@@ -46,11 +43,14 @@
         &.available {
             background-color: #42A5F5;
             border-color: #1976D2;
+            border-radius: 4px;
         }
 
         &.blocked {
             background-color: #E6EE9C;
             border-color: #D4E157;
+            padding: 2px;
+            border-radius: 4px;
         }
 
         &.spacer {
@@ -61,11 +61,13 @@
         &.sold {
             background-color: #FFC107;
             border-color: #FF8F00;
+            padding: 2px;
         }
 
         &.sold.mine {
             background-color: #FFA726;
             border-color: #FFB74D;
+            padding: 2px;
 
             &:hover {
                 background-color: #FFB74D;
@@ -91,7 +93,6 @@
     .s-row, .columns {
         display: flex;
         flex-direction: row;
-        justify-content: space-between;
     }
 }
 

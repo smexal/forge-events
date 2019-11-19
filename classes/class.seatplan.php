@@ -181,9 +181,9 @@ class Seatplan {
     public function getSeatRows() {
         $rowAmount = $this->collection->getMeta('seatplan_rows');
         if(! $rowAmount)
-            $rowAmount = 20;
+            $rowAmount = 'P';
         $rows = array();
-        for($count = 1; $count <= $rowAmount; $count++) {
+        for($count = 'A'; $count != $rowAmount; $count++) {
             $row = self::getRow($count);
             if(count($row) > 0) {
                 $rows[$count] = $row;
@@ -193,13 +193,13 @@ class Seatplan {
   }
 
     public function getRow($no) {
-        $name = 'A';
+        $name = 1;
         $columnAmount = $this->collection->getMeta('seatplan_columns');
         if(! $columnAmount )
             $columnAmount = 30;
 
         $columns = array();
-        for($count = 1; $count <= $columnAmount; $count++) {
+        for($count = 0; $count < $columnAmount; $count++) {
             $status = $this->getSeatStatus($name, $no);
             if($status !== 'undefined' || $this->trim == false) {
                 if($status == 'spacer' || $status == 'undefined') {
@@ -268,7 +268,7 @@ class Seatplan {
             }
         }
         return [
-            'tooltip' => $name.':'.$no.' - '.i($status),
+            'tooltip' => $no.':'.$name.' - '.i($status),
             'user' => $username,
             'checkin' => $checkin
         ];
