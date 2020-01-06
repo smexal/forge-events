@@ -27,6 +27,7 @@
         transition: 300ms;
         width: 24px !important;
         height: 24px !important;
+        margin: 2px;
         background-color: #FAFAFA;
         border: 1px solid #F0F0F0;
         cursor: pointer;
@@ -43,14 +44,14 @@
         &.available {
             background-color: #42A5F5;
             border-color: #1976D2;
-            border-radius: 4px;
+            border-radius: 7px;
         }
 
         &.blocked {
             background-color: #E6EE9C;
             border-color: #D4E157;
             padding: 2px;
-            border-radius: 4px;
+            border-radius: 7px;
         }
 
         &.spacer {
@@ -62,6 +63,107 @@
             background-color: #FFC107;
             border-color: #FF8F00;
             padding: 2px;
+            border-radius: 7px;
+        }
+
+        &.character {
+            background-color: transparent;
+            border-color: transparent;
+            text-align: center;
+            font-weight: bold;
+            color: dark;
+            font-size: 0.9rem;
+            line-height: 22px;
+            cursor: default;
+        }
+
+        &.icon {
+            &.icon-wall {
+                border-radius: 0;
+
+                &-t {
+                    border-top: 2px solid #333;
+                }
+                &-r {
+                    border-right: 2px solid #333;
+                }
+                &-b {
+                    border-bottom: 2px solid #333;
+                }
+                &-l {
+                    border-left: 2px solid #333;
+                }
+            }
+
+            &.icon-door {
+                img {
+                    max-width: 120%;
+                }
+            }
+
+            --flip: 1, 1;
+            --angle: 0;
+
+            transform: rotate(var(--angle)) scale(var(--flip));
+
+            &.deg-90 {
+                --angle: 90deg;
+            }
+            &.deg-180 {
+                --angle: 180deg;
+            }
+            &.deg-270 {
+                --angle: 270deg;
+            }
+
+            &.mirror-hor {
+                --flip: -1, 1;
+            }
+            &.mirror-ver {
+                --flip: 1, -1;
+            }
+
+
+            /*&.deg {
+                &-0 {
+                    transform: rotate(0);
+                    &.mirror-hor {
+                        transform: rotate(0) scale(-1, 1);
+                    }
+                    &.mirror-ver {
+                        transform: rotate(0) scale(1, -1);
+                    }
+                }
+                &-90 {
+                    transform: rotate(90deg);
+                    &.mirror-hor {
+                        transform: rotate(90deg) scale(-1, 1);
+                    }
+                    &.mirror-ver {
+                        transform: rotate(90deg) scale(1, -1);
+                    }
+                }
+                &-180 {
+                    transform: rotate(180deg);                    
+                    &.mirror-hor {
+                        transform: rotate(180deg) scale(-1, 1);
+                    }
+                    &.mirror-ver {
+                        transform: rotate(180deg) scale(1, -1);
+                    }
+                }
+                &-270 {
+                    transform: rotate(270deg);
+                    &.mirror-hor {
+                        transform: rotate(270deg) scale(-1, 1);
+                    }
+                    &.mirror-ver {
+                        transform: rotate(270deg) scale(1, -1);
+                    }
+                }
+            }*/
+
+
         }
 
         &.sold.mine {

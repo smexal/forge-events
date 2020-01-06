@@ -4,9 +4,11 @@
             {$amount}
         </div>
     {loop="status_list"}
+        {if="$value.name != 'character' && $value.name != 'icon'"}
         <div class="legend-entry">
             <div class="cell {$value.status}"></div><div class="label">{$value.name}</div>
         </div>
+        {/if}
     {/loop}
     </div>
     <div class="columns reveal">
@@ -22,8 +24,19 @@
     <div class="s-row reveal" data-row-id="{$key}">
         <div class="name">{$key}</div>
         {loop="value"}
-        <div class="cell {$value.status} {if="$value.tooltip"} tipster{/if}" {if="$value.tooltip"}title="{$value.tooltip}"{/if} data-cell-id="{$key}"
-        data-cell-user="{$value.user}">{if="$value.checkin"}<i class="material-icons">check</i>{/if}
+        <div 
+            class="
+                cell 
+                {$value.status} 
+                {if="$value.tooltip"} tipster{/if}
+                {if="$value.status == 'icon'"}{$value.value}{/if}
+                " 
+                {if="$value.tooltip && $value.status!='character' && $value.status!='icon'"}title="{$value.tooltip}"{/if} 
+                data-cell-id="{$key}"
+        data-cell-user="{$value.user}">
+            {if="$value.checkin"}<i class="material-icons">check</i>{/if}
+            {if="$value.status=='character'"}{$value.value}{/if}
+            {if="$value.status=='icon' && strstr($value.value, 'icon-door')"}<img src="{$wwwroot}/modules/forge-events/assets/icons/door-icon.svg" />{/if}
         </div>
         {/loop}
         <div class="name">{$key}</div>

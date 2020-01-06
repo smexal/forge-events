@@ -21,11 +21,13 @@ class Seatplan {
     private $db = null;
     private $soldSeats = null;
     public $actions = true;
-    private $seatStatus = array(
+    public $seatStatus = array(
         0 => 'available',
         1 => 'blocked',
         2 => 'spacer',
-        3 => 'sold'
+        3 => 'sold',
+        4 => 'character',
+        5 => 'icon'
      );
     /**
      * Help the translation crawler...
@@ -33,6 +35,8 @@ class Seatplan {
      * i('blocked', 'core');
      * i('spacer', 'core');
      * i('sold', 'core');
+     * i('character', 'core');
+     * i('icon', 'core');
      */
 
     public function __construct($id, $trim = false) {
@@ -55,7 +59,8 @@ class Seatplan {
             'api_url_context' => Auth::allowed('manage.forge-events', true) ? Utils::getUrl(array("manage", "forge-event-seatplan-context")) : 'false',
             'column_names' => $this->getRow(1),
             'rows' => $this->getSeatRows(),
-            'actions' => $this->actions
+            'actions' => $this->actions,
+            'wwwroot' => Utils::getHomeUrl()
         ));
     }
 
@@ -207,7 +212,8 @@ class Seatplan {
                         'status' => $status,
                         'tooltip' => false,
                         'user' => false,
-                        'checkin' => false
+                        'checkin' => false,
+                        'value' => $this->getSeatValue($name, $no)
                     );
                 } else {
                     $seatInfo = $this->getSeatInfo($name, $no, $status);
@@ -215,7 +221,8 @@ class Seatplan {
                         'status' => $status,
                         'tooltip' => $seatInfo['tooltip'],
                         'user' => $seatInfo['user'],
-                        'checkin' => $seatInfo['checkin']
+                        'checkin' => $seatInfo['checkin'],
+                        'value' => $this->getSeatValue($name, $no)
                     ];
                 }
             }
@@ -304,6 +311,14 @@ class Seatplan {
             }
         }
         return 'undefined';
+    }
+
+    public function getSeatValue($x, $y) {
+        $this->db->where('event', $this->event);
+        $this->db->where('x', $x);
+        $this->db->where('y', $y);
+        $data = $this->db->getOne('forge_events_seats');
+        return $data['value'];
     }
 
     public function handleRequest($query, $data) {
@@ -430,6 +445,33 @@ class Seatplan {
             ));
             $newSeatplan = new Seatplan($seat['event']);
             return json_encode(array( "plan" => $newSeatplan->draw()));
+        }
+    }
+
+    public function updateSeatData($seat) {
+        // not allowed....
+        if(! Auth::allowed('manage.forge-events', false)) {
+            return;
+        }
+
+        $this->db->where('x', $seat['x']);
+        $this->db->where('y', $seat['y']);
+        $this->db->where('event', $seat['event']);
+        $data = $this->db->getOne($this->seatTable);
+        if(count($data) > 0) {
+            $this->db->where('id', $data['id']);
+            $this->db->update($this->seatTable, array(
+                'type' => $seat['type'],
+                'value' => $seat['value']
+            ));
+        } else {
+            $this->db->insert($this->seatTable, array(
+                'event' => $seat['event'],
+                'x' => $seat['x'],
+                'y' => $seat['y'],
+                'type' => $seat['type'],
+                'value' => $seat['value']
+            ));
         }
     }
 
