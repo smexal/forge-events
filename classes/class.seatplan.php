@@ -57,7 +57,7 @@ class Seatplan {
             'event_id' => $this->event,
             'api_url' => Utils::getUrl(array("api", "forge-events", "seatplan", "toggle-seat")),
             'api_url_context' => Auth::allowed('manage.forge-events', true) ? Utils::getUrl(array("manage", "forge-event-seatplan-context")) : 'false',
-            'column_names' => $this->getRow(1),
+            'column_names' => $this->getRow('A'),
             'rows' => $this->getSeatRows(),
             'actions' => $this->actions,
             'wwwroot' => Utils::getHomeUrl()
@@ -185,7 +185,7 @@ class Seatplan {
 
     public function getSeatRows() {
         $rowAmount = $this->collection->getMeta('seatplan_rows');
-        if(! $rowAmount)
+        if(! $rowAmount || is_numeric($rowAmount))
             $rowAmount = 'P';
         $rows = array();
         for($count = 'A'; $count != $rowAmount; $count++) {
@@ -207,13 +207,24 @@ class Seatplan {
         for($count = 0; $count < $columnAmount; $count++) {
             $status = $this->getSeatStatus($name, $no);
             if($status !== 'undefined' || $this->trim == false) {
+                $value = $this->getSeatValue($name, $no);
+                $extra_class = '';
+                if($status == 'character') {
+                    $splitted = preg_split("/(.*)(\{.*\})/", $value, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+                    if(count($splitted) > 1) {
+                        $value = $splitted[0];
+                        $extra_class = str_replace("{", "", $splitted[1]);
+                        $extra_class = str_replace("}", "", $extra_class);
+                    }
+                }
                 if($status == 'spacer' || $status == 'undefined') {
                     $columns[$name] = array(
                         'status' => $status,
                         'tooltip' => false,
                         'user' => false,
                         'checkin' => false,
-                        'value' => $this->getSeatValue($name, $no)
+                        'value' => $value,
+                        'extra_class' => $extra_class
                     );
                 } else {
                     $seatInfo = $this->getSeatInfo($name, $no, $status);
@@ -222,7 +233,8 @@ class Seatplan {
                         'tooltip' => $seatInfo['tooltip'],
                         'user' => $seatInfo['user'],
                         'checkin' => $seatInfo['checkin'],
-                        'value' => $this->getSeatValue($name, $no)
+                        'value' => $value,
+                        'extra_class' => $extra_class
                     ];
                 }
             }

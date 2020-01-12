@@ -75,6 +75,20 @@
             font-size: 0.9rem;
             line-height: 22px;
             cursor: default;
+
+            display: flex;
+            letter-spacing: 2px;
+            justify-content: center;
+
+            &.deg-90 {
+                transform:rotate(90deg);
+            }
+            &.deg-180 {
+                transform:rotate(180deg);
+            }
+            &.deg-270 {
+                transform:rotate(270deg);
+            }
         }
 
         &.icon {
@@ -96,9 +110,8 @@
             }
 
             &.icon-door {
-                img {
-                    max-width: 120%;
-                }
+                border: 2px solid #333;
+                border-bottom-left-radius: 100px;
             }
 
             --flip: 1, 1;
@@ -122,47 +135,6 @@
             &.mirror-ver {
                 --flip: 1, -1;
             }
-
-
-            /*&.deg {
-                &-0 {
-                    transform: rotate(0);
-                    &.mirror-hor {
-                        transform: rotate(0) scale(-1, 1);
-                    }
-                    &.mirror-ver {
-                        transform: rotate(0) scale(1, -1);
-                    }
-                }
-                &-90 {
-                    transform: rotate(90deg);
-                    &.mirror-hor {
-                        transform: rotate(90deg) scale(-1, 1);
-                    }
-                    &.mirror-ver {
-                        transform: rotate(90deg) scale(1, -1);
-                    }
-                }
-                &-180 {
-                    transform: rotate(180deg);                    
-                    &.mirror-hor {
-                        transform: rotate(180deg) scale(-1, 1);
-                    }
-                    &.mirror-ver {
-                        transform: rotate(180deg) scale(1, -1);
-                    }
-                }
-                &-270 {
-                    transform: rotate(270deg);
-                    &.mirror-hor {
-                        transform: rotate(270deg) scale(-1, 1);
-                    }
-                    &.mirror-ver {
-                        transform: rotate(270deg) scale(1, -1);
-                    }
-                }
-            }*/
-
 
         }
 

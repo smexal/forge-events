@@ -25,7 +25,7 @@
         <div class="name">{$key}</div>
         {loop="value"}
         <div 
-            class="
+            class="{$value.extra_class} 
                 cell 
                 {$value.status} 
                 {if="$value.tooltip"} tipster{/if}
@@ -35,8 +35,8 @@
                 data-cell-id="{$key}"
         data-cell-user="{$value.user}">
             {if="$value.checkin"}<i class="material-icons">check</i>{/if}
-            {if="$value.status=='character'"}{$value.value}{/if}
-            {if="$value.status=='icon' && strstr($value.value, 'icon-door')"}<img src="{$wwwroot}/modules/forge-events/assets/icons/door-icon.svg" />{/if}
+            {if="$value.status=='character'"}<span>{$value.value}</span>{/if}
+            {if="$value.status=='icon' && strstr($value.value, 'icon-door')"}{/if}
         </div>
         {/loop}
         <div class="name">{$key}</div>

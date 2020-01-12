@@ -607,7 +607,7 @@ class EventCollection extends DataCollection {
                 'key' => 'seatplan_rows',
                 'label' => i('Amount of Rows on the Seatplan', 'forge-events'),
                 'multilang' => false,
-                'type' => 'number',
+                'type' => 'text',
                 'order' => 20,
                 'position' => 'right',
                 'hint' => ''
@@ -616,7 +616,7 @@ class EventCollection extends DataCollection {
                 'key' => 'seatplan_columns',
                 'label' => i('Amount of Columns on the Seatplan', 'forge-events'),
                 'multilang' => false,
-                'type' => 'number',
+                'type' => 'text',
                 'order' => 21,
                 'position' => 'right',
                 'hint' => ''
