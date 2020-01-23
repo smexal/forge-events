@@ -22,9 +22,9 @@ class Seatplan {
     private $soldSeats = null;
     public $actions = true;
     public $seatStatus = array(
-        0 => 'available',
-        1 => 'blocked',
-        2 => 'spacer',
+        0 => 'spacer',
+        1 => 'available',
+        2 => 'blocked',
         3 => 'sold',
         4 => 'character',
         5 => 'icon'

@@ -83,6 +83,8 @@ class EventCollection extends DataCollection {
             'location' => $item->getMeta('address'),
             'price_label' => i('Price', 'forge-events'),
             'price' => Utils::formatAmount($item->getMeta('price'), true),
+            'price_raw' => $item->getMeta('price'),
+            'currency' => \Forge\Modules\ForgePayment\Payment::getCurrency(),
             'participants_amount_label' => i('Amount of participants', 'forge-events'),
             'participants_amount' => $sold .' / '. $this->getEventMaximumAmount($item->id),
             'address' => $item->getMeta('address'),

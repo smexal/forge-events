@@ -1,3 +1,27 @@
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Event",
+  "location": {
+    "@type": "Place",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "{$location}"
+    },
+    "name": "{$location}"
+  },
+  "name": "{$title}",
+  "offers": {
+    "@type": "Offer",
+    "price": "{$price_raw}",
+    "priceCurrency": "{$currency}",
+    "url": "{$signup_url}",
+    "availability": {if="$signup"}"http://schema.org/InStock"{else}"http://schema.org/OutOfStock"{/if}
+  },
+  "startDate": "{$start_date}",
+  "description": "{$lead}"
+}
+</script>
 <div class="hero" {if="$header_image"}style="background-image:url({$header_image});"{/if}>
     <div class="wrapped">
         <div class="row">
