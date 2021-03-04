@@ -286,7 +286,7 @@ class SignupStepBuy {
                 "items" => $items,
                 "title" => $this->event->getMeta('title'),
                 "label" => $label,
-                "success" => Utils::getUrl(['event-signup', $this->event->slug()]),
+                "success" => Utils::getUrl(['event-signup', $this->event->slug()], true, ['order' => 'success']),
                 "cancel" => Utils::getUrl(['event-signup', $this->event->slug()])
             ));
         } else {

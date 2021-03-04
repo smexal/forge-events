@@ -19,6 +19,7 @@ class Signup {
 
         $this->steps['user'] = new SignupStepUser();
         $this->steps['buy'] = new SignupStepBuy($this->event);
+        $this->steps['success'] = new SignupStepSuccess();
         if( $this->event->getMeta('disable-seatplan') !== 'on') {
             $this->steps['seat'] = new SignupStepSeat($this->event);
         }
@@ -61,7 +62,11 @@ class Signup {
             $this->steps['buy']->allowed() &&
             ($this->event->getMeta('disable-seatplan') == 'on'
                 || ! $this->steps['seat']->allowed())) {
-            return 'buy';
+            if (array_key_exists('order', $_GET) && $_GET['order'] === 'success') {
+                return 'success';
+            } else {
+                return 'buy';
+            }
         }
         if( $this->steps['user']->allowed() &&
             ! $this->steps['buy']->allowed() &&
