@@ -53,6 +53,11 @@ class EventblockComponent extends Component {
                 'label' => i('Show user ticket progress', 'forge-events'),
                 'key' => $this->prefix.'user_ticket_progress_active',
                 'type' => 'checkbox'
+            ],
+            [
+                'label' => i('Hide global ticket progress bar', 'forge-events'),
+                'key' => $this->prefix.'ticket_progress_bar',
+                'type' => 'checkbox'
             ]
         ];
         return [
@@ -82,6 +87,7 @@ class EventblockComponent extends Component {
 
     public function content() {
         $eventId = $this->getField($this->prefix.'event');
+        $hideTicketProgress = $this->getField($this->prefix.'ticket_progress_bar');
 
         $collection = App::instance()->cm->getCollection('forge-events');
         $item = new CollectionItem($eventId);
@@ -103,6 +109,7 @@ class EventblockComponent extends Component {
             'blocktitle' => $this->getField($this->prefix.'title'),
             'lead' => $item->getMeta('description'),
             'text' => $item->getMeta('text'),
+            'hideTicketProgress' => $hideTicketProgress,
             'when_label' => i('When?', 'allocate'),
             'when_value' => $item->getMeta('start-date'),
             'where_label' => i('Where?', 'allocate'),
