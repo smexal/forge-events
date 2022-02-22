@@ -118,12 +118,14 @@ class ForgeEvents extends Module {
                 'cellAction' => ''
             ];
         }
-        $ths[] = [
-            'id' => 'detail',
-            'content' => i('Detail', 'forge-events'),
-            'class' => '',
-            'cellAction' => ''
-        ];
+        if(in_array("manage", Utils::getUriComponents())) {
+            $ths[] = [
+                'id' => 'detail',
+                'content' => i('Detail', 'forge-events'),
+                'class' => '',
+                'cellAction' => ''
+            ];
+        }
         return $ths;
     }
 
@@ -136,12 +138,14 @@ class ForgeEvents extends Module {
                 'cellAction' => ''
             ];
         }
-        $td[] = [
-            'id' => 'details',
-            'content' => '<a class="confirm ajax" href="' . Utils::getUrl(['manage', 'module-settings', 'forge-payment', 'orders', 'detail', $args['order']]) . '">' . i('Details', 'forge-events') . '</a>',
-            'class' => '',
-            'cellAction' => ''
-        ];
+        if(in_array("manage", Utils::getUriComponents())) {
+            $td[] = [
+                'id' => 'details',
+                'content' => '<a class="confirm ajax" href="' . Utils::getUrl(['manage', 'module-settings', 'forge-payment', 'orders', 'detail', $args['order']]) . '">' . i('Details', 'forge-events') . '</a>',
+                'class' => '',
+                'cellAction' => ''
+            ];
+        }
         return $td;
     }
 
